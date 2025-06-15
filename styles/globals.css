@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 250 100% 99%;
+    --foreground: 224 71.4% 4.1%;
+    --card: 0 0% 100%;
+    --card-foreground: 224 71.4% 4.1%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 71.4% 4.1%;
+    --primary: 266 100% 50%;
+    --primary-foreground: 210 20% 98%;
+    --secondary: 266 50% 95%;
+    --secondary-foreground: 266 50% 40%;
+    --muted: 266 50% 95%;
+    --muted-foreground: 266 30% 40%;
+    --accent: 266 50% 95%;
+    --accent-foreground: 266 50% 40%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 20% 98%;
+    --border: 266 30% 92%;
+    --input: 266 30% 92%;
+    --ring: 266 100% 50%;
+    --radius: 1rem;
+  }
+
+  .dark {
+    --background: 224 71.4% 4.1%;
+    --foreground: 210 20% 98%;
+    --card: 224 71.4% 4.1%;
+    --card-foreground: 210 20% 98%;
+    --popover: 224 71.4% 4.1%;
+    --popover-foreground: 210 20% 98%;
+    --primary: 266 100% 50%;
+    --primary-foreground: 210 20% 98%;
+    --secondary: 266 50% 15%;
+    --secondary-foreground: 266 50% 80%;
+    --muted: 266 50% 15%;
+    --muted-foreground: 266 30% 70%;
+    --accent: 266 50% 15%;
+    --accent-foreground: 266 50% 80%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 20% 98%;
+    --border: 266 50% 15%;
+    --input: 266 50% 15%;
+    --ring: 266 100% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* Ocultar scrollbar pero mantener funcionalidad */
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+/* Snap Scroll */
+.snap-x {
+  scroll-snap-type: x mandatory;
+}
+
+.snap-center {
+  scroll-snap-align: center;
+}
