@@ -19,6 +19,7 @@ export default function SimpleMap({ spots, selectedSpot, onSpotSelect }: MapProp
     east: 2.1988499,
     west: 2.1888499,
   })
+  const [hoveredSpot, setHoveredSpot] = useState<ParkingSpot | null>(null)
   const animationRef = useRef<number>()
 
   // Función para convertir coordenadas geográficas a píxeles
@@ -220,6 +221,8 @@ export default function SimpleMap({ spots, selectedSpot, onSpotSelect }: MapProp
         {spots.map((spot) => {
           const { x, y } = coordToPixel(spot.lat, spot.lng)
           const isSelected = selectedSpot?.id === spot.id
+          const isHovered = hoveredSpot?.id === spot.id
+          const showTooltip = isSelected || isHovered
           const isVisible =
             x >= -20 &&
             x <= (mapContainerRef.current?.offsetWidth || 0) + 20 &&
@@ -233,19 +236,27 @@ export default function SimpleMap({ spots, selectedSpot, onSpotSelect }: MapProp
               {/* Marcador */}
               <div
                 className={`absolute w-8 h-8 rounded-full border-2 border-white shadow-lg cursor-pointer transform -translate-x-1/2 -translate-y-1/2 transition-all duration-200 ${
-                  isSelected
-                    ? "bg-[#17A9A6] scale-125 z-40"
-                    : spot.type === "Pago"
+                  isSelected ? "bg-[#17A9A6] scale-125 z-40" : isHovered ? "scale-110 z-35" : ""
+                } ${
+                  !isSelected && !isHovered
+                    ? spot.type === "Pago"
                       ? "bg-blue-500 hover:scale-110"
                       : spot.type === "Exclusivo"
                         ? "bg-orange-500 hover:scale-110"
                         : "bg-green-500 hover:scale-110"
+                    : spot.type === "Pago"
+                      ? "bg-blue-500"
+                      : spot.type === "Exclusivo"
+                        ? "bg-orange-500"
+                        : "bg-green-500"
                 }`}
                 style={{
                   left: `${x}px`,
                   top: `${y}px`,
                 }}
                 onClick={() => onSpotSelect(spot)}
+                onMouseEnter={() => setHoveredSpot(spot)}
+                onMouseLeave={() => setHoveredSpot(null)}
               >
                 <div className="absolute inset-0 flex items-center justify-center">
                   <span className="text-white text-xs font-bold">P</span>
@@ -255,10 +266,12 @@ export default function SimpleMap({ spots, selectedSpot, onSpotSelect }: MapProp
                 )}
               </div>
 
-              {/* Tooltip */}
-              {isSelected && (
+              {/* Tooltip - se muestra al hacer hover o cuando está seleccionado */}
+              {showTooltip && (
                 <div
-                  className="absolute bg-white rounded-lg shadow-lg border border-gray-200 p-3 min-w-[200px] z-50"
+                  className={`absolute bg-white rounded-lg shadow-lg border border-gray-200 p-3 min-w-[200px] z-50 transition-all duration-200 ${
+                    isSelected ? "shadow-xl border-[#17A9A6]/20" : ""
+                  }`}
                   style={{
                     left: `${x + 20}px`,
                     top: `${y - 40}px`,
@@ -269,7 +282,7 @@ export default function SimpleMap({ spots, selectedSpot, onSpotSelect }: MapProp
                   }}
                 >
                   <div className="flex items-center gap-2 mb-1">
-                    <p className="font-semibold text-[#022222]">
+                    <p className={`font-semibold ${isSelected ? "text-[#17A9A6]" : "text-[#022222]"}`}>
                       Zone {spot.zone} - Spot {spot.spot}
                     </p>
                     <span
@@ -289,12 +302,22 @@ export default function SimpleMap({ spots, selectedSpot, onSpotSelect }: MapProp
                     <span className="font-medium text-[#022222]">{spot.price}</span>
                     <span className="text-gray-500">{spot.distance}</span>
                   </div>
-                  <button
-                    onClick={() => centerOnSpot(spot)}
-                    className="w-full text-xs bg-[#17A9A6] text-white px-2 py-1 rounded hover:bg-[#17A9A6]/90 transition-colors"
-                  >
-                    Center on map
-                  </button>
+                  {!isSelected && (
+                    <button
+                      onClick={() => onSpotSelect(spot)}
+                      className="w-full text-xs bg-[#17A9A6] text-white px-2 py-1 rounded hover:bg-[#17A9A6]/90 transition-colors"
+                    >
+                      Select this spot
+                    </button>
+                  )}
+                  {isSelected && (
+                    <button
+                      onClick={() => centerOnSpot(spot)}
+                      className="w-full text-xs bg-[#17A9A6] text-white px-2 py-1 rounded hover:bg-[#17A9A6]/90 transition-colors"
+                    >
+                      Center on map
+                    </button>
+                  )}
                 </div>
               )}
             </div>
