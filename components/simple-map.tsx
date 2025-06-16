@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, useCallback } from "react"
 import type { ParkingSpot } from "@/types/spots"
 
 interface MapProps {
@@ -19,6 +19,8 @@ export default function SimpleMap({ spots, selectedSpot, onSpotSelect }: MapProp
     east: 2.1988499,
     west: 2.1888499,
   })
+  const [isAnimating, setIsAnimating] = useState(false)
+  const animationRef = useRef<number>()
 
   // Función para convertir coordenadas geográficas a píxeles
   const coordToPixel = (lat: number, lng: number) => {
@@ -35,6 +37,48 @@ export default function SimpleMap({ spots, selectedSpot, onSpotSelect }: MapProp
     return { x, y }
   }
 
+  // Función de animación suave
+  const animateToPosition = useCallback(
+    (targetLat: number, targetLng: number, duration = 800) => {
+      if (isAnimating) {
+        if (animationRef.current) {
+          cancelAnimationFrame(animationRef.current)
+        }
+      }
+
+      setIsAnimating(true)
+      const startLat = mapCenter.lat
+      const startLng = mapCenter.lng
+      const startTime = Date.now()
+
+      const animate = () => {
+        const elapsed = Date.now() - startTime
+        const progress = Math.min(elapsed / duration, 1)
+
+        // Función de easing para una transición más suave
+        const easeInOutCubic = (t: number) => {
+          return t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1
+        }
+
+        const easedProgress = easeInOutCubic(progress)
+
+        const currentLat = startLat + (targetLat - startLat) * easedProgress
+        const currentLng = startLng + (targetLng - startLng) * easedProgress
+
+        setMapCenter({ lat: currentLat, lng: currentLng })
+
+        if (progress < 1) {
+          animationRef.current = requestAnimationFrame(animate)
+        } else {
+          setIsAnimating(false)
+        }
+      }
+
+      animationRef.current = requestAnimationFrame(animate)
+    },
+    [mapCenter, isAnimating],
+  )
+
   // Actualizar bounds del mapa basado en el centro y zoom
   useEffect(() => {
     const latRange = 0.005 / Math.pow(2, mapZoom - 15) // Ajustar rango según zoom
@@ -48,15 +92,30 @@ export default function SimpleMap({ spots, selectedSpot, onSpotSelect }: MapProp
     })
   }, [mapCenter, mapZoom])
 
-  // Centrar automáticamente en el spot seleccionado
+  // Centrar automáticamente en el spot seleccionado con animación suave
   useEffect(() => {
     if (selectedSpot) {
-      setMapCenter({ lat: selectedSpot.lat, lng: selectedSpot.lng })
+      animateToPosition(selectedSpot.lat, selectedSpot.lng)
     }
-  }, [selectedSpot])
+  }, [selectedSpot, animateToPosition])
+
+  // Limpiar animación al desmontar
+  useEffect(() => {
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current)
+      }
+    }
+  }, [])
 
   // Manejar el movimiento del mapa
   const handleMapMove = (direction: "up" | "down" | "left" | "right") => {
+    // Cancelar animación si está en curso
+    if (isAnimating && animationRef.current) {
+      cancelAnimationFrame(animationRef.current)
+      setIsAnimating(false)
+    }
+
     const moveAmount = 0.001 / Math.pow(2, mapZoom - 15)
 
     setMapCenter((prev) => {
@@ -83,9 +142,9 @@ export default function SimpleMap({ spots, selectedSpot, onSpotSelect }: MapProp
     })
   }
 
-  // Función para centrar manualmente en un spot
+  // Función para centrar manualmente en un spot con animación
   const centerOnSpot = (spot: ParkingSpot) => {
-    setMapCenter({ lat: spot.lat, lng: spot.lng })
+    animateToPosition(spot.lat, spot.lng)
   }
 
   return (
@@ -106,13 +165,13 @@ export default function SimpleMap({ spots, selectedSpot, onSpotSelect }: MapProp
           <div className="bg-white rounded-lg shadow-lg border border-gray-200">
             <button
               onClick={() => handleZoom(true)}
-              className="block w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-50 rounded-t-lg border-b border-gray-200"
+              className="block w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-50 rounded-t-lg border-b border-gray-200 transition-colors"
             >
               +
             </button>
             <button
               onClick={() => handleZoom(false)}
-              className="block w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-50 rounded-b-lg"
+              className="block w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-50 rounded-b-lg transition-colors"
             >
               −
             </button>
@@ -124,28 +183,28 @@ export default function SimpleMap({ spots, selectedSpot, onSpotSelect }: MapProp
               <div></div>
               <button
                 onClick={() => handleMapMove("up")}
-                className="w-6 h-6 flex items-center justify-center text-gray-600 hover:bg-gray-50 rounded text-xs"
+                className="w-6 h-6 flex items-center justify-center text-gray-600 hover:bg-gray-50 rounded text-xs transition-colors"
               >
                 ↑
               </button>
               <div></div>
               <button
                 onClick={() => handleMapMove("left")}
-                className="w-6 h-6 flex items-center justify-center text-gray-600 hover:bg-gray-50 rounded text-xs"
+                className="w-6 h-6 flex items-center justify-center text-gray-600 hover:bg-gray-50 rounded text-xs transition-colors"
               >
                 ←
               </button>
               <div className="w-6 h-6 bg-gray-100 rounded"></div>
               <button
                 onClick={() => handleMapMove("right")}
-                className="w-6 h-6 flex items-center justify-center text-gray-600 hover:bg-gray-50 rounded text-xs"
+                className="w-6 h-6 flex items-center justify-center text-gray-600 hover:bg-gray-50 rounded text-xs transition-colors"
               >
                 →
               </button>
               <div></div>
               <button
                 onClick={() => handleMapMove("down")}
-                className="w-6 h-6 flex items-center justify-center text-gray-600 hover:bg-gray-50 rounded text-xs"
+                className="w-6 h-6 flex items-center justify-center text-gray-600 hover:bg-gray-50 rounded text-xs transition-colors"
               >
                 ↓
               </button>
@@ -154,9 +213,16 @@ export default function SimpleMap({ spots, selectedSpot, onSpotSelect }: MapProp
           </div>
         </div>
 
+        {/* Indicador de animación */}
+        {isAnimating && (
+          <div className="absolute top-4 left-4 bg-[#17A9A6]/90 text-white px-3 py-2 rounded-lg text-sm font-medium z-10">
+            Centering map...
+          </div>
+        )}
+
         {/* Marcador de ubicación actual */}
         <div
-          className="absolute w-4 h-4 bg-[#17A9A6] rounded-full border-2 border-white shadow-lg transform -translate-x-1/2 -translate-y-1/2 z-20"
+          className="absolute w-4 h-4 bg-[#17A9A6] rounded-full border-2 border-white shadow-lg transform -translate-x-1/2 -translate-y-1/2 z-20 transition-all duration-300"
           style={{
             left: `${coordToPixel(41.3977081, 2.1938499).x}px`,
             top: `${coordToPixel(41.3977081, 2.1938499).y}px`,
@@ -181,14 +247,14 @@ export default function SimpleMap({ spots, selectedSpot, onSpotSelect }: MapProp
             <div key={spot.id} className="absolute z-30">
               {/* Marcador */}
               <div
-                className={`absolute w-8 h-8 rounded-full border-2 border-white shadow-lg cursor-pointer transform -translate-x-1/2 -translate-y-1/2 transition-all duration-200 ${
+                className={`absolute w-8 h-8 rounded-full border-2 border-white shadow-lg cursor-pointer transform -translate-x-1/2 -translate-y-1/2 transition-all duration-300 ${
                   isSelected
-                    ? "bg-[#17A9A6] scale-125 z-40"
+                    ? "bg-[#17A9A6] scale-125 z-40 shadow-xl"
                     : spot.type === "Pago"
-                      ? "bg-blue-500 hover:scale-110"
+                      ? "bg-blue-500 hover:scale-110 hover:shadow-lg"
                       : spot.type === "Exclusivo"
-                        ? "bg-orange-500 hover:scale-110"
-                        : "bg-green-500 hover:scale-110"
+                        ? "bg-orange-500 hover:scale-110 hover:shadow-lg"
+                        : "bg-green-500 hover:scale-110 hover:shadow-lg"
                 }`}
                 style={{
                   left: `${x}px`,
@@ -207,7 +273,7 @@ export default function SimpleMap({ spots, selectedSpot, onSpotSelect }: MapProp
               {/* Tooltip */}
               {isSelected && (
                 <div
-                  className="absolute bg-white rounded-lg shadow-lg border border-gray-200 p-3 min-w-[200px] z-50"
+                  className="absolute bg-white rounded-lg shadow-xl border border-gray-200 p-3 min-w-[200px] z-50 animate-in fade-in-0 zoom-in-95 duration-200"
                   style={{
                     left: `${x + 20}px`,
                     top: `${y - 40}px`,
@@ -251,10 +317,11 @@ export default function SimpleMap({ spots, selectedSpot, onSpotSelect }: MapProp
         })}
 
         {/* Información del mapa */}
-        <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-2 text-xs text-gray-600">
+        <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-2 text-xs text-gray-600 transition-all duration-300">
           <div>Zoom: {mapZoom}</div>
           <div>Lat: {mapCenter.lat.toFixed(6)}</div>
           <div>Lng: {mapCenter.lng.toFixed(6)}</div>
+          {isAnimating && <div className="text-[#17A9A6] font-medium">Animating...</div>}
         </div>
       </div>
     </div>
