@@ -48,6 +48,13 @@ export default function SimpleMap({ spots, selectedSpot, onSpotSelect }: MapProp
     })
   }, [mapCenter, mapZoom])
 
+  // Centrar automáticamente en el spot seleccionado
+  useEffect(() => {
+    if (selectedSpot) {
+      setMapCenter({ lat: selectedSpot.lat, lng: selectedSpot.lng })
+    }
+  }, [selectedSpot])
+
   // Manejar el movimiento del mapa
   const handleMapMove = (direction: "up" | "down" | "left" | "right") => {
     const moveAmount = 0.001 / Math.pow(2, mapZoom - 15)
