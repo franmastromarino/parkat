@@ -154,4 +154,3 @@ export function NavigationModal({ isOpen, onClose, spot }: NavigationModalProps)
     </Dialog>
   )
 }
-

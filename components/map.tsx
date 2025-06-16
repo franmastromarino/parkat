@@ -204,4 +204,3 @@ export default function Map({ spots, selectedSpot, onSpotSelect }: MapProps) {
 
   return <div ref={mapContainer} className={styles.map} />
 }
-

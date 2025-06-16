@@ -12,13 +12,16 @@ import type { ParkingSpot } from "@/types/spots"
 import { NavigationModal } from "@/components/navigation-modal"
 import { toast } from "sonner"
 
-const MapWithNoSSR = dynamic(() => import("@/components/map"), {
+// Importar el mapa simplificado en lugar del mapa con maplibre-gl
+const SimpleMapWithNoSSR = dynamic(() => import("@/components/simple-map"), {
   ssr: false,
   loading: () => (
-    <div className="h-full w-full bg-secondary/50 animate-pulse flex items-center justify-center">
+    <div className="h-full w-full bg-gray-100 animate-pulse flex items-center justify-center">
       <div className="flex flex-col items-center gap-4">
-        <div className="w-16 h-16 rounded-full bg-secondary animate-pulse" />
-        <p className="text-secondary-foreground font-medium">Loading map...</p>
+        <div className="w-16 h-16 rounded-full bg-white/50 flex items-center justify-center">
+          <div className="w-8 h-8 text-[#17A9A6]/50">🗺️</div>
+        </div>
+        <p className="text-[#17A9A6] font-medium">Loading map...</p>
       </div>
     </div>
   ),
@@ -49,6 +52,7 @@ export default function MovoApp() {
 
   const handleSpotSelect = (spot: ParkingSpot) => {
     setSelectedSpot(spot)
+    toast.success(`Selected Zone ${spot.zone} - Spot ${spot.spot}`)
 
     // Scroll al spot seleccionado
     const spotIndex = sortedSpots.findIndex((s) => s.id === spot.id)
@@ -76,16 +80,15 @@ export default function MovoApp() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#F2F5F4]">
       {/* Header */}
-      <header className="sticky top-0 z-[1000] bg-background/80 backdrop-blur-xl border-b">
+      <header className="sticky top-0 z-[1000] bg-[#17A9A6] backdrop-blur-xl">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-2">
               <UserMenu />
               <div className="flex flex-col gap-1">
                 <img src="/logo.png" alt="Logo" className="h-8 object-contain" />
-                {/* <p className="text-xs text-muted-foreground">Keep moving!</p> */}
               </div>
             </div>
             <SpotsMenu spots={sortedSpots} selectedSpot={selectedSpot} onSpotSelect={handleSpotSelect} />
@@ -97,22 +100,22 @@ export default function MovoApp() {
       <main className="relative max-w-7xl mx-auto">
         {/* Map Container */}
         <div className="h-[50vh] md:h-[60vh] relative overflow-hidden shadow-lg">
-          <MapWithNoSSR spots={sortedSpots} selectedSpot={selectedSpot} onSpotSelect={handleSpotSelect} />
+          <SimpleMapWithNoSSR spots={sortedSpots} selectedSpot={selectedSpot} onSpotSelect={handleSpotSelect} />
         </div>
 
         {/* Spots List */}
         <div className="p-4 md:p-6 space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-semibold">Available Parking Spots</h2>
-              <p className="text-sm text-muted-foreground">Quick access to closest parking spots</p>
+              <h2 className="text-lg font-semibold text-[#022222]">Available Parking Spots</h2>
+              <p className="text-sm text-[#022222]/70">Quick access to closest parking spots</p>
             </div>
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
                 size="icon"
                 onClick={() => scroll("up")}
-                className="rounded-full hover:bg-primary/10 hover:text-primary border-2"
+                className="rounded-full hover:bg-[#17A9A6]/10 hover:text-[#17A9A6] border-2 border-[#95DBD5]"
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
@@ -120,14 +123,14 @@ export default function MovoApp() {
                 variant="outline"
                 size="icon"
                 onClick={() => scroll("down")}
-                className="rounded-full hover:bg-primary/10 hover:text-primary border-2"
+                className="rounded-full hover:bg-[#17A9A6]/10 hover:text-[#17A9A6] border-2 border-[#95DBD5]"
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
           </div>
 
-          {/* Carrusel horizontal */}
+          {/* Lista vertical */}
           <div className="relative">
             <div
               ref={scrollContainerRef}
@@ -138,15 +141,15 @@ export default function MovoApp() {
                   key={spot.id}
                   className={`flex-none w-full snap-center border-2 transition-all hover:shadow-md cursor-pointer ${
                     selectedSpot?.id === spot.id
-                      ? "border-primary shadow-lg shadow-primary/10"
-                      : "border-border hover:border-primary/20"
+                      ? "border-[#17A9A6] shadow-lg shadow-[#17A9A6]/10"
+                      : "border-[#95DBD5]/30 hover:border-[#17A9A6]/20"
                   }`}
                   onClick={() => handleSpotSelect(spot)}
                 >
                   <CardContent className="p-4 flex items-center gap-4">
                     <div
                       className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-colors ${
-                        selectedSpot?.id === spot.id ? "bg-primary text-white" : "bg-secondary text-primary"
+                        selectedSpot?.id === spot.id ? "bg-[#17A9A6] text-white" : "bg-[#95DBD5]/20 text-[#17A9A6]"
                       }`}
                     >
                       <Car className="w-6 h-6" />
@@ -154,18 +157,18 @@ export default function MovoApp() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2 min-w-0">
-                          <p className="font-medium truncate">
+                          <p className="font-medium truncate text-[#022222]">
                             Zone {spot.zone} - Spot {spot.spot}
                           </p>
                           <span
                             className={`shrink-0 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${
                               spot.type === "Pago"
-                                ? "bg-parkat-primary/10 text-parkat-primary"
+                                ? "bg-[#17A9A6]/10 text-[#17A9A6]"
                                 : spot.type === "Exclusivo"
-                                  ? "bg-parkat-light/30 text-parkat-dark"
+                                  ? "bg-[#95DBD5]/30 text-[#022222]"
                                   : spot.type === "Gratuito"
-                                    ? "bg-parkat-gray text-parkat-dark"
-                                    : "bg-secondary text-secondary-foreground"
+                                    ? "bg-[#F2F5F4] text-[#022222]"
+                                    : "bg-gray-100 text-gray-700"
                             }`}
                           >
                             {spot.type}
@@ -173,12 +176,12 @@ export default function MovoApp() {
                         </div>
                       </div>
                       <div className="flex items-center gap-4 mt-1">
-                        <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-1.5 text-sm text-[#022222]/70">
                           <Clock className="w-4 h-4" />
                           <span>{spot.maxTime}</span>
                         </div>
-                        <span className="text-sm font-medium text-primary">{spot.price}</span>
-                        <span className="text-sm text-muted-foreground ml-auto">{spot.distance}</span>
+                        <span className="text-sm font-medium text-[#17A9A6]">{spot.price}</span>
+                        <span className="text-sm text-[#022222]/70 ml-auto">{spot.distance}</span>
                       </div>
                     </div>
                   </CardContent>
@@ -190,8 +193,14 @@ export default function MovoApp() {
       </main>
 
       {/* Bottom Action Button */}
-      <div className="fixed bottom-0 p-6 left-0 right-0 flex justify-center z-50 before:content-[''] before:absolute before:inset-x-0 before:bottom-0 before:h-24 before:bg-gradient-to-t before:from-background/100 before:to-transparent before:pointer-events-none before:-z-10">
-        <Button variant="default" size="xl" onClick={handleParkNow} disabled={!selectedSpot} className="min-w-[200px]">
+      <div className="fixed bottom-0 p-6 left-0 right-0 flex justify-center z-50 before:content-[''] before:absolute before:inset-x-0 before:bottom-0 before:h-24 before:bg-gradient-to-t before:from-[#F2F5F4]/100 before:to-transparent before:pointer-events-none before:-z-10">
+        <Button
+          variant="default"
+          size="xl"
+          onClick={handleParkNow}
+          disabled={!selectedSpot}
+          className="min-w-[200px] bg-[#17A9A6] hover:bg-[#17A9A6]/90 text-white"
+        >
           {selectedSpot ? (
             <>
               <Navigation className="w-5 h-5 mr-2" />
@@ -213,4 +222,3 @@ export default function MovoApp() {
     </div>
   )
 }
-
