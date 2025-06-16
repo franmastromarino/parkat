@@ -7,10 +7,10 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="es">
       <head>
         <title>Parkat - Keep moving!</title>
-        <meta name="description" content="Find and book parking spots easily with Parkat" />
+        <meta name="description" content="Encuentra y reserva espacios de aparcamiento fácilmente con Parkat" />
       </head>
       <body>{children}</body>
     </html>

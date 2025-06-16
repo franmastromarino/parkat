@@ -74,7 +74,7 @@ function SpotCard({ spot, onSelect, isSelected }: SpotCardProps) {
               variant={isSelected ? "default" : "outline"}
               className={isSelected ? "" : "border-primary/20 text-primary hover:bg-primary/10"}
             >
-              {isSelected ? "Selected" : "Select"}
+              {isSelected ? "Seleccionado" : "Seleccionar"}
             </Button>
           </div>
         </div>
@@ -98,21 +98,21 @@ export function SpotsMenu({ spots, selectedSpot, onSpotSelect }: SpotMenuProps) 
           }}
         >
           <span className="font-semibold text-primary mr-1">{spots.length}</span>
-          spots available
+espacios disponibles
           <span className="absolute right-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-green-500 shadow-lg shadow-green-500/50" />
         </Button>
       </SheetTrigger>
       <SheetContent side="right" className="w-[90vw] sm:w-[540px] p-6">
         <SheetHeader className="space-y-1">
-          <SheetTitle>Available Parking Spots</SheetTitle>
-          <p className="text-sm text-muted-foreground">Find and select your perfect parking spot</p>
+          <SheetTitle>Espacios de Aparcamiento Disponibles</SheetTitle>
+          <p className="text-sm text-muted-foreground">Encuentra y selecciona tu espacio de aparcamiento perfecto</p>
         </SheetHeader>
 
         {/* Search and Filter */}
         <div className="flex gap-2 my-6">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Search spots..." className="pl-10" />
+            <Input placeholder="Buscar espacios..." className="pl-10" />
           </div>
           <Button variant="outline" size="icon" className="shrink-0">
             <Filter className="h-4 w-4" />

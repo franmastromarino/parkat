@@ -31,7 +31,7 @@ export function NavigationModal({ isOpen, onClose, spot }: NavigationModalProps)
           setDuration("5 min")
         },
         (error) => {
-          setLocationError("Please enable location services to use navigation")
+          setLocationError("Por favor habilita los servicios de ubicación para usar la navegación")
           console.error("Error getting location:", error)
         },
       )
@@ -58,7 +58,7 @@ export function NavigationModal({ isOpen, onClose, spot }: NavigationModalProps)
       <DialogContent className="sm:max-w-[425px] p-0">
         <div className="p-6 space-y-6">
           <DialogHeader>
-            <DialogTitle className="text-xl">Navigate to Parking Spot</DialogTitle>
+            <DialogTitle className="text-xl">Navegar al Aparcamiento</DialogTitle>
           </DialogHeader>
 
           {/* Spot Info */}
@@ -94,17 +94,17 @@ export function NavigationModal({ isOpen, onClose, spot }: NavigationModalProps)
                 <div className="flex flex-col items-center gap-2 p-3 bg-secondary/30 rounded-lg">
                   <Navigation className="w-5 h-5 text-primary" />
                   <span className="text-sm font-medium">{distance}</span>
-                  <span className="text-xs text-muted-foreground">Distance</span>
+                  <span className="text-xs text-muted-foreground">Distancia</span>
                 </div>
                 <div className="flex flex-col items-center gap-2 p-3 bg-secondary/30 rounded-lg">
                   <Clock className="w-5 h-5 text-primary" />
                   <span className="text-sm font-medium">{duration}</span>
-                  <span className="text-xs text-muted-foreground">Duration</span>
+                  <span className="text-xs text-muted-foreground">Duración</span>
                 </div>
                 <div className="flex flex-col items-center gap-2 p-3 bg-secondary/30 rounded-lg">
                   <MapPin className="w-5 h-5 text-primary" />
                   <span className="text-sm font-medium">{spot.distance}</span>
-                  <span className="text-xs text-muted-foreground">From you</span>
+                  <span className="text-xs text-muted-foreground">Desde ti</span>
                 </div>
               </div>
             )
@@ -120,8 +120,8 @@ export function NavigationModal({ isOpen, onClose, spot }: NavigationModalProps)
             >
               <GoogleMapsIcon className="w-6 h-6" />
               <div className="flex flex-col items-start">
-                <span>Open in Google Maps</span>
-                <span className="text-xs text-white/70">Most popular option</span>
+                <span>Abrir en Google Maps</span>
+                <span className="text-xs text-white/70">Opción más popular</span>
               </div>
             </Button>
             <Button
@@ -132,8 +132,8 @@ export function NavigationModal({ isOpen, onClose, spot }: NavigationModalProps)
             >
               <WazeIcon className="w-6 h-6" />
               <div className="flex flex-col items-start">
-                <span>Open in Waze</span>
-                <span className="text-xs text-white/70">Real-time traffic updates</span>
+                <span>Abrir en Waze</span>
+                <span className="text-xs text-white/70">Actualizaciones de tráfico en tiempo real</span>
               </div>
             </Button>
             <Button
@@ -144,8 +144,8 @@ export function NavigationModal({ isOpen, onClose, spot }: NavigationModalProps)
             >
               <AppleMapsIcon className="w-6 h-6" />
               <div className="flex flex-col items-start">
-                <span>Open in Apple Maps</span>
-                <span className="text-xs text-white/70">Best for iOS devices</span>
+                <span>Abrir en Apple Maps</span>
+                <span className="text-xs text-white/70">Mejor para dispositivos iOS</span>
               </div>
             </Button>
           </div>

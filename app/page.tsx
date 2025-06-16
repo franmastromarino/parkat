@@ -21,7 +21,7 @@ const SimpleMapWithNoSSR = dynamic(() => import("@/components/simple-map"), {
         <div className="w-16 h-16 rounded-full bg-white/50 flex items-center justify-center">
           <div className="w-8 h-8 text-[#17A9A6]/50">🗺️</div>
         </div>
-        <p className="text-[#17A9A6] font-medium">Loading map...</p>
+        <p className="text-[#17A9A6] font-medium">Cargando mapa...</p>
       </div>
     </div>
   ),
@@ -44,7 +44,7 @@ export default function MovoApp() {
 
   const handleParkNow = () => {
     if (!selectedSpot) {
-      toast.error("Please select a parking spot first")
+      toast.error("Por favor selecciona un espacio de aparcamiento primero")
       return
     }
     setIsNavigationOpen(true)
@@ -52,7 +52,7 @@ export default function MovoApp() {
 
   const handleSpotSelect = (spot: ParkingSpot) => {
     setSelectedSpot(spot)
-    toast.success(`Selected Zone ${spot.zone} - Spot ${spot.spot}`)
+    toast.success(`Seleccionado Zona ${spot.zone} - Espacio ${spot.spot}`)
 
     // Scroll al spot seleccionado
     const spotIndex = sortedSpots.findIndex((s) => s.id === spot.id)
@@ -82,7 +82,7 @@ export default function MovoApp() {
   return (
     <div className="min-h-screen bg-[#F2F5F4]">
       {/* Header */}
-      <header className="sticky top-0 z-[1000] bg-[#17A9A6] backdrop-blur-xl">
+      <header className="sticky top-0 z-[1000] bg-[#e0f5f2] backdrop-blur-xl">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-2">
@@ -107,8 +107,8 @@ export default function MovoApp() {
         <div className="p-4 md:p-6 space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-semibold text-[#022222]">Available Parking Spots</h2>
-              <p className="text-sm text-[#022222]/70">Quick access to closest parking spots</p>
+              <h2 className="text-lg font-semibold text-[#022222]">Espacios de Aparcamiento Disponibles</h2>
+              <p className="text-sm text-[#022222]/70">Acceso rápido a los espacios de aparcamiento más cercanos</p>
             </div>
             <div className="flex items-center gap-2">
               <Button
@@ -204,12 +204,12 @@ export default function MovoApp() {
           {selectedSpot ? (
             <>
               <Navigation className="w-5 h-5 mr-2" />
-              Navigate Now
+              Navegar Ahora
             </>
           ) : (
             <>
               <Plus className="w-5 h-5 mr-2" />
-              Select Spot
+              Seleccionar Espacio
             </>
           )}
         </Button>
