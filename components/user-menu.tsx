@@ -1,12 +1,12 @@
 "use client"
-
-import type React from "react"
+import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Bell, CreditCard, LogOut, Menu, Settings, User } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
+import { Badge } from "@/components/ui/badge"
 
 const menuItems = [
   {
@@ -31,11 +31,21 @@ const menuItems = [
   },
 ]
 
+// Add state to track if sheet is open (add this after the menuItems array)
 export function UserMenu() {
+  const [isOpen, setIsOpen] = useState(false)
   return (
-    <Sheet>
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="hover:bg-secondary">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="hover:bg-secondary"
+          onClick={() => {
+            console.log("Menu button clicked")
+            setIsOpen(true)
+          }}
+        >
           <Menu className="h-6 w-6" />
         </Button>
       </SheetTrigger>
@@ -54,7 +64,9 @@ export function UserMenu() {
             <h3 className="font-semibold">John Doe</h3>
             <p className="text-sm text-muted-foreground">john@example.com</p>
             <div className="mt-1.5">
-              <Badge variant="premium">Subscripcion</Badge>
+              <Badge variant="secondary" className="bg-gradient-to-r from-primary to-violet-400 text-white">
+                Subscripcion
+              </Badge>
             </div>
           </div>
         </div>
@@ -100,13 +112,5 @@ export function UserMenu() {
         </Button>
       </SheetContent>
     </Sheet>
-  )
-}
-
-function Badge({ variant, children }: { variant: "premium"; children: React.ReactNode }) {
-  return (
-    <div className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-gradient-to-r from-primary to-violet-400 text-white">
-      {children}
-    </div>
   )
 }

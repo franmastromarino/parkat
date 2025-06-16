@@ -8,11 +8,19 @@ import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import type { ParkingSpot } from "@/types/spots"
+import { useState } from "react"
 
 interface SpotCardProps {
   spot: ParkingSpot
   onSelect: (spot: ParkingSpot) => void
   isSelected: boolean
+}
+
+// Add state to track if sheet is open (add this after the interface)
+interface SpotMenuProps {
+  spots: ParkingSpot[]
+  selectedSpot: ParkingSpot | null
+  onSpotSelect: (spot: ParkingSpot) => void
 }
 
 function SpotCard({ spot, onSelect, isSelected }: SpotCardProps) {
@@ -75,19 +83,19 @@ function SpotCard({ spot, onSelect, isSelected }: SpotCardProps) {
   )
 }
 
-interface SpotMenuProps {
-  spots: ParkingSpot[]
-  selectedSpot: ParkingSpot | null
-  onSpotSelect: (spot: ParkingSpot) => void
-}
-
 export function SpotsMenu({ spots, selectedSpot, onSpotSelect }: SpotMenuProps) {
+  const [isOpen, setIsOpen] = useState(false)
+
   return (
-    <Sheet>
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
         <Button
           variant="outline"
           className="relative pl-4 pr-10 h-11 border-2 hover:border-primary/30 hover:bg-secondary"
+          onClick={() => {
+            console.log("Spots button clicked")
+            setIsOpen(true)
+          }}
         >
           <span className="font-semibold text-primary mr-1">{spots.length}</span>
           spots available
