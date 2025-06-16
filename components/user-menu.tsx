@@ -1,47 +1,57 @@
 "use client"
-
-import type React from "react"
+import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Bell, CreditCard, LogOut, Menu, Settings, User } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
+import { Badge } from "@/components/ui/badge"
 
 const menuItems = [
   {
     icon: User,
-    label: "Profile Settings",
-    description: "Manage your account information",
+    label: "Configuración del Perfil",
+    description: "Administra la información de tu cuenta",
   },
   {
     icon: CreditCard,
-    label: "Subscription",
-    description: "View your subscription details",
+    label: "Suscripción",
+    description: "Ve los detalles de tu suscripción",
   },
   {
     icon: Bell,
-    label: "Notifications",
-    description: "Configure your notifications",
+    label: "Notificaciones",
+    description: "Configura tus notificaciones",
   },
   {
     icon: Settings,
-    label: "Preferences",
-    description: "Customize your experience",
+    label: "Preferencias",
+    description: "Personaliza tu experiencia",
   },
 ]
 
+// Add state to track if sheet is open (add this after the menuItems array)
 export function UserMenu() {
+  const [isOpen, setIsOpen] = useState(false)
   return (
-    <Sheet>
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="hover:bg-secondary">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="hover:bg-secondary"
+          onClick={() => {
+            console.log("Menu button clicked")
+            setIsOpen(true)
+          }}
+        >
           <Menu className="h-6 w-6" />
         </Button>
       </SheetTrigger>
       <SheetContent side="left" className="w-[300px] sm:w-[400px] p-6">
         <SheetHeader>
-          <SheetTitle>Menu</SheetTitle>
+          <SheetTitle>Menú</SheetTitle>
         </SheetHeader>
 
         {/* User Profile Section */}
@@ -54,7 +64,9 @@ export function UserMenu() {
             <h3 className="font-semibold">John Doe</h3>
             <p className="text-sm text-muted-foreground">john@example.com</p>
             <div className="mt-1.5">
-              <Badge variant="premium">Subscripcion</Badge>
+              <Badge variant="secondary" className="bg-gradient-to-r from-primary to-violet-400 text-white">
+                Subscripcion
+              </Badge>
             </div>
           </div>
         </div>
@@ -67,11 +79,7 @@ export function UserMenu() {
             const Icon = item.icon
             return (
               <Button key={index} variant="ghost" className="w-full justify-start gap-4 h-auto p-4 hover:bg-secondary">
-                <div
-                  className={`w-10 h-10 rounded-xl flex items-center justify-center bg-secondary text-primary ${
-                    index === 0 ? "bg-primary text-white" : ""
-                  }`}
-                >
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-primary text-white">
                   <Icon className="h-5 w-5" />
                 </div>
                 <div className="flex flex-col items-start">
@@ -91,23 +99,14 @@ export function UserMenu() {
           className="w-full justify-start gap-4 h-auto p-4 text-red-500 hover:bg-red-50 hover:text-red-600"
         >
           <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-red-50">
-            <LogOut className="h-5 w-5" />
+            <LogOut className="h-5 w-5 text-red-500" />
           </div>
           <div className="flex flex-col items-start">
-            <span className="font-medium">Log out</span>
-            <span className="text-sm text-red-400">Sign out of your account</span>
+            <span className="font-medium">Cerrar sesión</span>
+            <span className="text-sm text-red-400">Salir de tu cuenta</span>
           </div>
         </Button>
       </SheetContent>
     </Sheet>
   )
 }
-
-function Badge({ variant, children }: { variant: "premium"; children: React.ReactNode }) {
-  return (
-    <div className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-gradient-to-r from-primary to-violet-400 text-white">
-      {children}
-    </div>
-  )
-}
-

@@ -8,11 +8,19 @@ import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import type { ParkingSpot } from "@/types/spots"
+import { useState } from "react"
 
 interface SpotCardProps {
   spot: ParkingSpot
   onSelect: (spot: ParkingSpot) => void
   isSelected: boolean
+}
+
+// Add state to track if sheet is open (add this after the interface)
+interface SpotMenuProps {
+  spots: ParkingSpot[]
+  selectedSpot: ParkingSpot | null
+  onSpotSelect: (spot: ParkingSpot) => void
 }
 
 function SpotCard({ spot, onSelect, isSelected }: SpotCardProps) {
@@ -66,7 +74,7 @@ function SpotCard({ spot, onSelect, isSelected }: SpotCardProps) {
               variant={isSelected ? "default" : "outline"}
               className={isSelected ? "" : "border-primary/20 text-primary hover:bg-primary/10"}
             >
-              {isSelected ? "Selected" : "Select"}
+              {isSelected ? "Seleccionado" : "Seleccionar"}
             </Button>
           </div>
         </div>
@@ -75,36 +83,36 @@ function SpotCard({ spot, onSelect, isSelected }: SpotCardProps) {
   )
 }
 
-interface SpotMenuProps {
-  spots: ParkingSpot[]
-  selectedSpot: ParkingSpot | null
-  onSpotSelect: (spot: ParkingSpot) => void
-}
-
 export function SpotsMenu({ spots, selectedSpot, onSpotSelect }: SpotMenuProps) {
+  const [isOpen, setIsOpen] = useState(false)
+
   return (
-    <Sheet>
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
         <Button
           variant="outline"
           className="relative pl-4 pr-10 h-11 border-2 hover:border-primary/30 hover:bg-secondary"
+          onClick={() => {
+            console.log("Spots button clicked")
+            setIsOpen(true)
+          }}
         >
           <span className="font-semibold text-primary mr-1">{spots.length}</span>
-          spots available
+espacios disponibles
           <span className="absolute right-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-green-500 shadow-lg shadow-green-500/50" />
         </Button>
       </SheetTrigger>
       <SheetContent side="right" className="w-[90vw] sm:w-[540px] p-6">
         <SheetHeader className="space-y-1">
-          <SheetTitle>Available Parking Spots</SheetTitle>
-          <p className="text-sm text-muted-foreground">Find and select your perfect parking spot</p>
+          <SheetTitle>Espacios de Aparcamiento Disponibles</SheetTitle>
+          <p className="text-sm text-muted-foreground">Encuentra y selecciona tu espacio de aparcamiento perfecto</p>
         </SheetHeader>
 
         {/* Search and Filter */}
         <div className="flex gap-2 my-6">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Search spots..." className="pl-10" />
+            <Input placeholder="Buscar espacios..." className="pl-10" />
           </div>
           <Button variant="outline" size="icon" className="shrink-0">
             <Filter className="h-4 w-4" />
@@ -125,4 +133,3 @@ export function SpotsMenu({ spots, selectedSpot, onSpotSelect }: SpotMenuProps) 
     </Sheet>
   )
 }
-

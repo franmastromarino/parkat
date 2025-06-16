@@ -4,7 +4,7 @@ import { Toaster } from "sonner"
 
 export const metadata = {
   title: "Parkat - Keep moving!",
-  description: "Find and book parking spots easily with Parkat",
+  description: "Encuentra y reserva espacios de aparcamiento fácilmente con Parkat",
     generator: 'v0.dev'
 }
 
@@ -14,7 +14,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="es" suppressHydrationWarning>
       <body>
         {children}
         <Toaster position="top-center" />
@@ -22,4 +22,3 @@ export default function RootLayout({
     </html>
   )
 }
-
