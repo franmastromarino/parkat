@@ -78,7 +78,7 @@ export function NavigationModal({ isOpen, onClose, spot }: NavigationModalProps)
                 <span className="text-sm font-medium text-primary">{spot.price}</span>
               </div>
             </div>
-            <Badge variant={spot.type === "Electric" ? "success" : spot.type === "Premium" ? "premium" : "secondary"}>
+            <Badge variant={spot.type === "Gratuito" ? "success" : spot.type === "Pago" ? "premium" : "secondary"}>
               {spot.type}
             </Badge>
           </div>

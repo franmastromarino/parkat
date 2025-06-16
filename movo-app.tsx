@@ -32,7 +32,7 @@ export default function MovoApp() {
       <header className="sticky top-0 z-[1000] bg-violet-600 text-white p-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Menu className="w-6 h-6" />
-          <h1 className="text-2xl font-bold">movo</h1>
+          <img src="/logo.png" alt="Logo" className="w-8 h-8" />
         </div>
         <div className="flex items-center gap-4">
           <div className="text-sm bg-violet-500 px-3 py-1 rounded-full">

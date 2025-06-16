@@ -18,7 +18,7 @@ export default function Map({ spots, selectedSpot, onSpotSelect }: MapProps) {
   const popupsRef = useRef<{ [key: number]: maplibregl.Popup }>({})
   const mapContainer = useRef<HTMLDivElement>(null)
 
-  // Inicializar mapa y marcadores
+  // Inicializar mapa una sola vez
   useEffect(() => {
     if (!mapContainer.current || mapRef.current) return
 
@@ -56,79 +56,18 @@ export default function Map({ spots, selectedSpot, onSpotSelect }: MapProps) {
           },
         ],
       },
-      center: [spots[0].lng, spots[0].lat],
+      center: [2.1938499, 41.3977081],
       zoom: 15,
     })
 
     const map = mapRef.current
 
-    // Crear marcadores y popups
-    spots.forEach((spot) => {
-      // Crear el elemento del marcador
-      const markerEl = document.createElement("div")
-      markerEl.className = styles.marker
-
-      if (selectedSpot?.id === spot.id) {
-        markerEl.classList.add(styles.selected)
-      }
-
-      // Crear el popup
-      const popup = new maplibregl.Popup({
-        offset: 25,
-        closeButton: false,
-        className: styles.popup,
-        maxWidth: "300px",
-      }).setHTML(`
-        <div class="p-3">
-          <div class="flex items-center gap-2 mb-1">
-            <p class="font-semibold text-violet-900">Zone ${spot.zone} - Spot ${spot.spot}</p>
-            <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${
-              spot.type === "Electric"
-                ? "bg-green-100 text-green-700 border-green-200"
-                : spot.type === "Premium"
-                  ? "bg-amber-100 text-amber-700 border-amber-200"
-                  : "bg-gray-100 text-gray-700 border-gray-200"
-            }">
-              ${spot.type}
-            </span>
-          </div>
-          <div class="flex items-center gap-3 text-sm">
-            <span class="text-violet-600">${spot.maxTime}</span>
-            <span class="font-medium text-violet-900">${spot.price}</span>
-            <span class="text-gray-500">${spot.distance}</span>
-          </div>
-        </div>
-      `)
-
-      // Crear el marcador
-      const marker = new maplibregl.Marker({
-        element: markerEl,
-        anchor: "center",
-      })
-        .setLngLat([spot.lng, spot.lat])
-        .addTo(map)
-
-      // Guardar referencias
-      markersRef.current[spot.id] = marker
-      popupsRef.current[spot.id] = popup
-
-      // Eventos del marcador
-      markerEl.addEventListener("click", (e) => {
-        e.stopPropagation()
-        onSpotSelect(spot)
-      })
-
-      markerEl.addEventListener("mouseenter", () => {
-        marker.setPopup(popup)
-        popup.addTo(map)
-      })
-
-      markerEl.addEventListener("mouseleave", () => {
-        if (selectedSpot?.id !== spot.id) {
-          popup.remove()
-        }
-      })
+    // Agregar marcador en la posición por defecto
+    new maplibregl.Marker({
+      color: "#17A9A6"
     })
+      .setLngLat([2.1938499, 41.3977081])
+      .addTo(map)
 
     // Agregar controles de zoom
     map.addControl(
@@ -140,16 +79,100 @@ export default function Map({ spots, selectedSpot, onSpotSelect }: MapProps) {
     )
 
     return () => {
-      Object.values(markersRef.current).forEach((marker) => marker.remove())
-      Object.values(popupsRef.current).forEach((popup) => popup.remove())
-      markersRef.current = {}
-      popupsRef.current = {}
       if (mapRef.current) {
         mapRef.current.remove()
         mapRef.current = null
       }
     }
-  }, [spots, selectedSpot?.id, onSpotSelect]) // Solo se ejecuta al montar/desmontar
+  }, []) // Solo se ejecuta al montar/desmontar
+
+  // Crear marcadores cuando el mapa esté listo
+  useEffect(() => {
+    if (!mapRef.current) return
+
+    const map = mapRef.current
+
+    // Esperar a que el mapa esté completamente cargado
+    if (!map.isStyleLoaded()) {
+      map.on('styledata', () => {
+        if (Object.keys(markersRef.current).length > 0) return
+
+        createMarkers()
+      })
+    } else {
+      if (Object.keys(markersRef.current).length === 0) {
+        createMarkers()
+      }
+    }
+
+    function createMarkers() {
+      // Crear marcadores y popups
+      spots.forEach((spot) => {
+        // Crear el elemento del marcador
+        const markerEl = document.createElement("div")
+        markerEl.className = styles.marker
+
+        // Crear el popup
+        const popup = new maplibregl.Popup({
+          offset: 25,
+          closeButton: false,
+          className: styles.popup,
+          maxWidth: "300px",
+        }).setHTML(`
+          <div class="p-3">
+            <div class="flex items-center gap-2 mb-1">
+              <p class="font-semibold text-parkat-dark">Zone ${spot.zone} - Spot ${spot.spot}</p>
+              <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${
+                spot.type === "Pago"
+                  ? "bg-parkat-primary/10 text-parkat-primary border-parkat-primary/20"
+                  : spot.type === "Exclusivo"
+                    ? "bg-parkat-light/30 text-parkat-dark border-parkat-light"
+                    : spot.type === "Gratuito"
+                      ? "bg-parkat-gray text-parkat-dark border-parkat-gray"
+                      : "bg-secondary text-secondary-foreground"
+              }">
+                ${spot.type}
+              </span>
+            </div>
+            <div class="flex items-center gap-3 text-sm">
+              <span class="text-parkat-primary">${spot.maxTime}</span>
+              <span class="font-medium text-parkat-dark">${spot.price}</span>
+              <span class="text-gray-500">${spot.distance}</span>
+            </div>
+          </div>
+        `)
+
+        // Crear el marcador
+        const marker = new maplibregl.Marker({
+          element: markerEl,
+          anchor: "center",
+        })
+          .setLngLat([spot.lng, spot.lat])
+          .addTo(map)
+
+        // Guardar referencias
+        markersRef.current[spot.id] = marker
+        popupsRef.current[spot.id] = popup
+
+        // Eventos del marcador
+        markerEl.addEventListener("click", (e) => {
+          e.stopPropagation()
+          onSpotSelect(spot)
+        })
+
+        markerEl.addEventListener("mouseenter", () => {
+          marker.setPopup(popup)
+          popup.addTo(map)
+        })
+
+        markerEl.addEventListener("mouseleave", () => {
+          if (selectedSpot?.id !== spot.id) {
+            popup.remove()
+          }
+        })
+      })
+    }
+  }, [spots, onSpotSelect, selectedSpot?.id])
 
   // Actualizar estado visual de los marcadores cuando cambia la selección
   useEffect(() => {

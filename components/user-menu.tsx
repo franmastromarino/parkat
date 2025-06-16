@@ -45,16 +45,16 @@ export function UserMenu() {
         </SheetHeader>
 
         {/* User Profile Section */}
-        <div className="flex items-center gap-4 py-6">
+        <div className="flex items-center gap-4 py-6 pt-12">
           <Avatar className="h-16 w-16 border-2 border-primary">
-            <AvatarImage src="/placeholder.svg" />
+            <AvatarImage src="/placeholder.jpeg" />
             <AvatarFallback className="bg-secondary text-primary font-medium">JD</AvatarFallback>
           </Avatar>
           <div>
             <h3 className="font-semibold">John Doe</h3>
             <p className="text-sm text-muted-foreground">john@example.com</p>
             <div className="mt-1.5">
-              <Badge variant="premium">Premium Plan</Badge>
+              <Badge variant="premium">Subscripcion</Badge>
             </div>
           </div>
         </div>

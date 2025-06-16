@@ -47,11 +47,13 @@ function SpotCard({ spot, onSelect, isSelected }: SpotCardProps) {
             <Badge
               variant="secondary"
               className={`shrink-0 ${
-                spot.type === "Electric"
-                  ? "bg-green-100 text-green-700 hover:bg-green-100"
-                  : spot.type === "Premium"
-                    ? "bg-amber-100 text-amber-700 hover:bg-amber-100"
-                    : "bg-secondary text-secondary-foreground"
+                spot.type === "Pago"
+                  ? "bg-parkat-primary/10 text-parkat-primary hover:bg-parkat-primary/10"
+                  : spot.type === "Exclusivo"
+                    ? "bg-parkat-light/30 text-parkat-dark hover:bg-parkat-light/30"
+                    : spot.type === "Gratuito"
+                      ? "bg-parkat-gray text-parkat-dark hover:bg-parkat-gray"
+                      : "bg-secondary text-secondary-foreground"
               }`}
             >
               {spot.type}

@@ -9,8 +9,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <title>Movo - Smart Parking</title>
-        <meta name="description" content="Find and book parking spots easily with Movo" />
+        <title>Parkat - Keep moving!</title>
+        <meta name="description" content="Find and book parking spots easily with Parkat" />
       </head>
       <body>{children}</body>
     </html>

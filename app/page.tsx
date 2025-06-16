@@ -53,23 +53,23 @@ export default function MovoApp() {
     // Scroll al spot seleccionado
     const spotIndex = sortedSpots.findIndex((s) => s.id === spot.id)
     if (scrollContainerRef.current && spotIndex !== -1) {
-      const cardWidth = scrollContainerRef.current.offsetWidth / 3
-      const scrollPosition = Math.max(0, (spotIndex - 1) * cardWidth)
+      const cardHeight = scrollContainerRef.current.scrollHeight / sortedSpots.length
+      const scrollPosition = Math.max(0, spotIndex * cardHeight)
       scrollContainerRef.current.scrollTo({
-        left: scrollPosition,
+        top: scrollPosition,
         behavior: "smooth",
       })
     }
   }
 
-  const scroll = (direction: "left" | "right") => {
+  const scroll = (direction: "up" | "down") => {
     if (scrollContainerRef.current) {
-      const cardWidth = scrollContainerRef.current.offsetWidth / 3
-      const currentScroll = scrollContainerRef.current.scrollLeft
-      const newScroll = direction === "left" ? currentScroll - cardWidth : currentScroll + cardWidth
+      const cardHeight = scrollContainerRef.current.scrollHeight / sortedSpots.length
+      const currentScroll = scrollContainerRef.current.scrollTop
+      const newScroll = direction === "up" ? currentScroll - cardHeight : currentScroll + cardHeight
 
       scrollContainerRef.current.scrollTo({
-        left: newScroll,
+        top: newScroll,
         behavior: "smooth",
       })
     }
@@ -83,11 +83,9 @@ export default function MovoApp() {
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-2">
               <UserMenu />
-              <div className="flex flex-col">
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-violet-400 bg-clip-text text-transparent">
-                  movo
-                </h1>
-                <p className="text-xs text-muted-foreground">Smart Parking</p>
+              <div className="flex flex-col gap-1">
+                <img src="/logo.png" alt="Logo" className="h-8 object-contain" />
+                {/* <p className="text-xs text-muted-foreground">Keep moving!</p> */}
               </div>
             </div>
             <SpotsMenu spots={sortedSpots} selectedSpot={selectedSpot} onSpotSelect={handleSpotSelect} />
@@ -98,7 +96,7 @@ export default function MovoApp() {
       {/* Main Content */}
       <main className="relative max-w-7xl mx-auto">
         {/* Map Container */}
-        <div className="h-[50vh] md:h-[60vh] relative rounded-b-3xl overflow-hidden shadow-lg">
+        <div className="h-[50vh] md:h-[60vh] relative overflow-hidden shadow-lg">
           <MapWithNoSSR spots={sortedSpots} selectedSpot={selectedSpot} onSpotSelect={handleSpotSelect} />
         </div>
 
@@ -113,7 +111,7 @@ export default function MovoApp() {
               <Button
                 variant="outline"
                 size="icon"
-                onClick={() => scroll("left")}
+                onClick={() => scroll("up")}
                 className="rounded-full hover:bg-primary/10 hover:text-primary border-2"
               >
                 <ChevronLeft className="h-4 w-4" />
@@ -121,7 +119,7 @@ export default function MovoApp() {
               <Button
                 variant="outline"
                 size="icon"
-                onClick={() => scroll("right")}
+                onClick={() => scroll("down")}
                 className="rounded-full hover:bg-primary/10 hover:text-primary border-2"
               >
                 <ChevronRight className="h-4 w-4" />
@@ -133,12 +131,12 @@ export default function MovoApp() {
           <div className="relative">
             <div
               ref={scrollContainerRef}
-              className="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory scrollbar-hide"
+              className="flex flex-col overflow-y-auto gap-4 pb-4 snap-y snap-mandatory scrollbar-hide max-h-96"
             >
               {sortedSpots.map((spot) => (
                 <Card
                   key={spot.id}
-                  className={`flex-none w-[calc(33.333%-8px)] snap-center border-2 transition-all hover:shadow-md cursor-pointer ${
+                  className={`flex-none w-full snap-center border-2 transition-all hover:shadow-md cursor-pointer ${
                     selectedSpot?.id === spot.id
                       ? "border-primary shadow-lg shadow-primary/10"
                       : "border-border hover:border-primary/20"
@@ -161,11 +159,13 @@ export default function MovoApp() {
                           </p>
                           <span
                             className={`shrink-0 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${
-                              spot.type === "Electric"
-                                ? "bg-green-100 text-green-700"
-                                : spot.type === "Premium"
-                                  ? "bg-amber-100 text-amber-700"
-                                  : "bg-secondary text-secondary-foreground"
+                              spot.type === "Pago"
+                                ? "bg-parkat-primary/10 text-parkat-primary"
+                                : spot.type === "Exclusivo"
+                                  ? "bg-parkat-light/30 text-parkat-dark"
+                                  : spot.type === "Gratuito"
+                                    ? "bg-parkat-gray text-parkat-dark"
+                                    : "bg-secondary text-secondary-foreground"
                             }`}
                           >
                             {spot.type}
@@ -190,7 +190,7 @@ export default function MovoApp() {
       </main>
 
       {/* Bottom Action Button */}
-      <div className="fixed bottom-6 left-0 right-0 flex justify-center z-50">
+      <div className="fixed bottom-0 p-6 left-0 right-0 flex justify-center z-50 before:content-[''] before:absolute before:inset-x-0 before:bottom-0 before:h-24 before:bg-gradient-to-t before:from-background/100 before:to-transparent before:pointer-events-none before:-z-10">
         <Button variant="default" size="xl" onClick={handleParkNow} disabled={!selectedSpot} className="min-w-[200px]">
           {selectedSpot ? (
             <>

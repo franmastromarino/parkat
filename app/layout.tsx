@@ -3,8 +3,8 @@ import "./globals.css"
 import { Toaster } from "sonner"
 
 export const metadata = {
-  title: "Movo - Smart Parking",
-  description: "Find and book parking spots easily with Movo",
+  title: "Parkat - Keep moving!",
+  description: "Find and book parking spots easily with Parkat",
     generator: 'v0.dev'
 }
 
@@ -14,7 +14,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body>
         {children}
         <Toaster position="top-center" />

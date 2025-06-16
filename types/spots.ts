@@ -5,7 +5,7 @@ export interface ParkingSpot {
   zone: string
   spot: string
   maxTime: string
-  type: "Standard" | "Electric" | "Premium"
+  type: "Exclusivo" | "Gratuito" | "Pago"
   price: string
   distance: string
 }
