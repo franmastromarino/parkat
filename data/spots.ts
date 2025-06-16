@@ -134,3 +134,4 @@ export const parkingSpots: ParkingSpot[] = [
     distance: "170m",
   },
 ]
+

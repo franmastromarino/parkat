@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Car, Clock, ChevronLeft, ChevronRight, Plus, Navigation, MapPin } from "lucide-react"
+import { Car, Clock, ChevronLeft, ChevronRight, Plus, Navigation } from "lucide-react"
 import { useState, useRef } from "react"
 import dynamic from "next/dynamic"
 import { UserMenu } from "@/components/user-menu"
@@ -11,17 +11,14 @@ import { parkingSpots } from "@/data/spots"
 import type { ParkingSpot } from "@/types/spots"
 import { NavigationModal } from "@/components/navigation-modal"
 import { toast } from "sonner"
-import { Logo } from "@/components/logo"
 
-const SimpleMapWithNoSSR = dynamic(() => import("@/components/simple-map"), {
+const MapWithNoSSR = dynamic(() => import("@/components/map"), {
   ssr: false,
   loading: () => (
-    <div className="h-full w-full bg-gradient-to-br from-slate-100 to-slate-200 animate-pulse flex items-center justify-center">
+    <div className="h-full w-full bg-secondary/50 animate-pulse flex items-center justify-center">
       <div className="flex flex-col items-center gap-4">
-        <div className="w-16 h-16 rounded-full bg-white/50 flex items-center justify-center">
-          <MapPin className="w-8 h-8 text-primary/50" />
-        </div>
-        <p className="text-primary font-medium">Loading map...</p>
+        <div className="w-16 h-16 rounded-full bg-secondary animate-pulse" />
+        <p className="text-secondary-foreground font-medium">Loading map...</p>
       </div>
     </div>
   ),
@@ -36,7 +33,7 @@ const sortSpotsByDistance = (spots: ParkingSpot[]) => {
   })
 }
 
-export default function ParkatApp() {
+export default function MovoApp() {
   const [selectedSpot, setSelectedSpot] = useState<ParkingSpot | null>(null)
   const [isNavigationOpen, setIsNavigationOpen] = useState(false)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
@@ -52,7 +49,6 @@ export default function ParkatApp() {
 
   const handleSpotSelect = (spot: ParkingSpot) => {
     setSelectedSpot(spot)
-    toast.success(`Selected Zone ${spot.zone} - Spot ${spot.spot}`)
 
     // Scroll al spot seleccionado
     const spotIndex = sortedSpots.findIndex((s) => s.id === spot.id)
@@ -88,8 +84,10 @@ export default function ParkatApp() {
             <div className="flex items-center gap-2">
               <UserMenu />
               <div className="flex flex-col">
-                <Logo />
-                <p className="text-xs text-muted-foreground ml-1">Smart Parking</p>
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-violet-400 bg-clip-text text-transparent">
+                  movo
+                </h1>
+                <p className="text-xs text-muted-foreground">Smart Parking</p>
               </div>
             </div>
             <SpotsMenu spots={sortedSpots} selectedSpot={selectedSpot} onSpotSelect={handleSpotSelect} />
@@ -101,7 +99,7 @@ export default function ParkatApp() {
       <main className="relative max-w-7xl mx-auto">
         {/* Map Container */}
         <div className="h-[50vh] md:h-[60vh] relative rounded-b-3xl overflow-hidden shadow-lg">
-          <SimpleMapWithNoSSR spots={sortedSpots} selectedSpot={selectedSpot} onSpotSelect={handleSpotSelect} />
+          <MapWithNoSSR spots={sortedSpots} selectedSpot={selectedSpot} onSpotSelect={handleSpotSelect} />
         </div>
 
         {/* Spots List */}
@@ -215,3 +213,4 @@ export default function ParkatApp() {
     </div>
   )
 }
+

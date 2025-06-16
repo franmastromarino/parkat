@@ -123,3 +123,4 @@ export function SpotsMenu({ spots, selectedSpot, onSpotSelect }: SpotMenuProps) 
     </Sheet>
   )
 }
+

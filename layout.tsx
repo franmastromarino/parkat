@@ -1,5 +1,5 @@
 import type React from "react"
-import "./app/globals.css"
+import "./globals.css"
 
 export default function RootLayout({
   children,
@@ -9,10 +9,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <title>Parkat - Smart Parking</title>
-        <meta name="description" content="Find and book parking spots easily with Parkat" />
+        <title>Movo - Smart Parking</title>
+        <meta name="description" content="Find and book parking spots easily with Movo" />
       </head>
       <body>{children}</body>
     </html>
   )
 }
+

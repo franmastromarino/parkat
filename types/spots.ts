@@ -9,3 +9,4 @@ export interface ParkingSpot {
   price: string
   distance: string
 }
+

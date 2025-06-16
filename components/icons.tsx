@@ -50,3 +50,4 @@ export function AppleMapsIcon({ className }: IconProps) {
     </svg>
   )
 }
+

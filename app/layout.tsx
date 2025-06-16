@@ -3,8 +3,8 @@ import "./globals.css"
 import { Toaster } from "sonner"
 
 export const metadata = {
-  title: "Parkat - Smart Parking",
-  description: "Find and book parking spots easily with Parkat",
+  title: "Movo - Smart Parking",
+  description: "Find and book parking spots easily with Movo",
     generator: 'v0.dev'
 }
 
@@ -22,3 +22,4 @@ export default function RootLayout({
     </html>
   )
 }
+
