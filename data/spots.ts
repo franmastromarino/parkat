@@ -1,14 +1,5 @@
 import type { ParkingSpot } from "@/types/spots"
 
-// Coordenadas de Barcelona (41.3977081, 2.1938499)
-const centerLat = 41.3977081
-const centerLng = 2.1938499
-
-// Función para generar coordenadas cercanas
-const nearbyCoord = (base: number, range = 0.003) => {
-  return base + (Math.random() * range * 2 - range)
-}
-
 export const parkingSpots: ParkingSpot[] = [
   {
     id: 1,
@@ -18,8 +9,7 @@ export const parkingSpots: ParkingSpot[] = [
     maxTime: "2h máx",
     price: "€2.50/h",
     distance: "120m",
-    lat: nearbyCoord(centerLat, 0.001),
-    lng: nearbyCoord(centerLng, 0.001),
+    coords: { lat: 41.3975, lng: 2.1913 },
   },
   {
     id: 2,
@@ -29,8 +19,7 @@ export const parkingSpots: ParkingSpot[] = [
     maxTime: "2h máx",
     price: "€2.50/h",
     distance: "150m",
-    lat: nearbyCoord(centerLat, 0.001),
-    lng: nearbyCoord(centerLng, 0.001),
+    coords: { lat: 41.3971, lng: 2.1897 },
   },
   {
     id: 3,
@@ -40,8 +29,7 @@ export const parkingSpots: ParkingSpot[] = [
     maxTime: "4h máx",
     price: "€3.00/h",
     distance: "200m",
-    lat: nearbyCoord(centerLat, 0.002),
-    lng: nearbyCoord(centerLng, 0.002),
+    coords: { lat: 41.3983, lng: 2.1921 },
   },
   {
     id: 4,
@@ -51,8 +39,7 @@ export const parkingSpots: ParkingSpot[] = [
     maxTime: "1h máx",
     price: "Gratis",
     distance: "250m",
-    lat: nearbyCoord(centerLat, 0.002),
-    lng: nearbyCoord(centerLng, 0.002),
+    coords: { lat: 41.3969, lng: 2.1940 },
   },
   {
     id: 5,
@@ -62,8 +49,7 @@ export const parkingSpots: ParkingSpot[] = [
     maxTime: "3h máx",
     price: "€2.00/h",
     distance: "300m",
-    lat: nearbyCoord(centerLat, 0.0025),
-    lng: nearbyCoord(centerLng, 0.0025),
+    coords: { lat: 41.3958, lng: 2.1955 },
   },
   {
     id: 6,
@@ -73,8 +59,7 @@ export const parkingSpots: ParkingSpot[] = [
     maxTime: "2h máx",
     price: "€4.00/h",
     distance: "320m",
-    lat: nearbyCoord(centerLat, 0.0025),
-    lng: nearbyCoord(centerLng, 0.0025),
+    coords: { lat: 41.3954, lng: 2.1928 },
   },
   {
     id: 7,
@@ -84,8 +69,7 @@ export const parkingSpots: ParkingSpot[] = [
     maxTime: "30min",
     price: "Gratis",
     distance: "400m",
-    lat: nearbyCoord(centerLat, 0.003),
-    lng: nearbyCoord(centerLng, 0.003),
+    coords: { lat: 41.3943, lng: 2.1905 },
   },
   {
     id: 8,
@@ -95,7 +79,6 @@ export const parkingSpots: ParkingSpot[] = [
     maxTime: "4h máx",
     price: "€1.50/h",
     distance: "450m",
-    lat: nearbyCoord(centerLat, 0.003),
-    lng: nearbyCoord(centerLng, 0.003),
+    coords: { lat: 41.3960, lng: 2.1886 },
   },
 ]

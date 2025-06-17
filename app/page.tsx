@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useCallback } from "react"
 import dynamic from "next/dynamic"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
@@ -11,31 +11,28 @@ import { SpotsMenu } from "@/components/spots-menu"
 import { parkingSpots } from "@/data/spots"
 import type { ParkingSpot } from "@/types/spots"
 import { NavigationModal } from "@/components/navigation-modal"
-
-const SimpleMapWithNoSSR = dynamic(() => import("@/components/simple-map"), {
-  ssr: false,
-  loading: () => (
-    <div className="h-[300px] bg-gray-100 animate-pulse flex items-center justify-center">
-      <div className="flex flex-col items-center gap-4">
-        <div className="w-16 h-16 rounded-full bg-white/50 flex items-center justify-center">
-          <div className="w-8 h-8 text-[#17A9A6]/50">🗺️</div>
-        </div>
-        <p className="text-[#17A9A6] font-medium">Cargando mapa...</p>
-      </div>
-    </div>
-  )
-})
+import { GoogleMap, Marker, useLoadScript } from "@react-google-maps/api"
 
 const sortSpotsByDistance = (spots: ParkingSpot[]) =>
   [...spots].sort((a, b) => parseInt(a.distance) - parseInt(b.distance))
 
-export default function MovoApp() {
+const containerStyle = {
+  width: "100%",
+  height: "100%",
+}
+
+const defaultCenter = { lat: 41.3851, lng: 2.1734 } // Barcelona
+
+const LIBRARIES: ("places")[] = ["places"]
+
+export default function App() {
   const [selectedSpot, setSelectedSpot] = useState<ParkingSpot | null>(null)
   const [isNavigationOpen, setIsNavigationOpen] = useState(false)
   const [currentIndex, setCurrentIndex] = useState(0)
   const sortedSpots = sortSpotsByDistance(parkingSpots)
 
   const itemRefs = useRef<(HTMLDivElement | null)[]>([])
+  const mapRef = useRef<google.maps.Map | null>(null)
 
   const scrollToIndex = (index: number) => {
     const el = itemRefs.current[index]
@@ -49,23 +46,22 @@ export default function MovoApp() {
     setCurrentIndex(index)
     scrollToIndex(index)
     toast.success(`Seleccionado Zona ${spot.zone} - Espacio ${spot.spot}`)
+    if (spot.coords?.lat && spot.coords?.lng) {
+      mapRef.current?.panTo(spot.coords)
+    }
   }
 
   const scrollNext = () => {
     if (currentIndex < sortedSpots.length - 1) {
       const nextIndex = currentIndex + 1
-      setSelectedSpot(sortedSpots[nextIndex])
-      setCurrentIndex(nextIndex)
-      scrollToIndex(nextIndex)
+      handleSpotSelect(sortedSpots[nextIndex], nextIndex)
     }
   }
 
   const scrollPrev = () => {
     if (currentIndex > 0) {
       const prevIndex = currentIndex - 1
-      setSelectedSpot(sortedSpots[prevIndex])
-      setCurrentIndex(prevIndex)
-      scrollToIndex(prevIndex)
+      handleSpotSelect(sortedSpots[prevIndex], prevIndex)
     }
   }
 
@@ -76,6 +72,17 @@ export default function MovoApp() {
     }
     setIsNavigationOpen(true)
   }
+
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
+    libraries: LIBRARIES,
+  })
+
+  const onLoad = useCallback((map: google.maps.Map) => {
+    mapRef.current = map
+  }, [])
+
+  const isSelected = (spot: ParkingSpot) => selectedSpot?.id === spot.id
 
   return (
     <div className="h-screen flex flex-col bg-[#F2F5F4]">
@@ -95,11 +102,57 @@ export default function MovoApp() {
 
       <main className="flex-1 flex flex-col max-w-7xl w-full mx-auto" style={{ height: "calc(100vh - 76px)" }}>
         <div className="h-[50vh] relative overflow-hidden shadow-lg">
-          <SimpleMapWithNoSSR
-            spots={sortedSpots}
-            selectedSpot={selectedSpot}
-            onSpotSelect={(spot) => handleSpotSelect(spot, sortedSpots.findIndex((s) => s.id === spot.id))}
-          />
+          {!isLoaded ? (
+            <div className="w-full h-full bg-gray-100 animate-pulse" />
+          ) : (
+            <GoogleMap
+              mapContainerStyle={containerStyle}
+              center={selectedSpot?.coords || defaultCenter}
+              zoom={15}
+              onLoad={onLoad}
+            >
+              {sortedSpots.map((spot) => (
+                <Marker
+                  key={spot.id}
+                  position={spot.coords}
+                  icon={{
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale: 10,
+                    fillColor:
+                      spot.type === "Pago"
+                        ? "#F97316"
+                        : spot.type === "Gratuito"
+                          ? "#10B981"
+                          : "#3B82F6",
+                    fillOpacity: 1,
+                    strokeWeight: isSelected(spot) ? 2 : 0,
+                    strokeColor: "white",
+                  }}
+                  label={{
+                    text: "P",
+                    color: "white",
+                    fontSize: "14px",
+                    fontWeight: "bold",
+                  }}
+                  onClick={() => handleSpotSelect(spot, sortedSpots.findIndex((s) => s.id === spot.id))}
+                />
+              ))}
+            </GoogleMap>
+          )}
+          <div className="absolute bottom-4 left-4 z-10 bg-white/90 backdrop-blur-sm rounded-xl px-4 py-2 shadow-md text-sm flex gap-4 items-center">
+            <div className="flex items-center gap-1">
+              <span className="w-3 h-3 rounded-full bg-[#F97316]"></span>
+              <span className="text-gray-800">Pago</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="w-3 h-3 rounded-full bg-[#10B981]"></span>
+              <span className="text-gray-800">Gratuito</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="w-3 h-3 rounded-full bg-[#3B82F6]"></span>
+              <span className="text-gray-800">Exclusivo</span>
+            </div>
+          </div>
         </div>
 
         <div className="flex-1 min-h-0 overflow-hidden">
@@ -112,7 +165,7 @@ export default function MovoApp() {
                   size="icon"
                   onClick={scrollPrev}
                   disabled={currentIndex === 0}
-                  className="rounded-full border-2 border-[#95DBD5]"
+                  className="rounded-full border-2 border-[#95DBD5] disabled:opacity-50"
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
@@ -121,7 +174,7 @@ export default function MovoApp() {
                   size="icon"
                   onClick={scrollNext}
                   disabled={currentIndex >= sortedSpots.length - 1}
-                  className="rounded-full border-2 border-[#95DBD5]"
+                  className="rounded-full border-2 border-[#95DBD5] disabled:opacity-50"
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Button>
@@ -133,14 +186,14 @@ export default function MovoApp() {
                 <div key={spot.id} ref={(el) => (itemRefs.current[index] = el)}>
                   <Card
                     onClick={() => handleSpotSelect(spot, index)}
-                    className={`w-full border-2 cursor-pointer ${selectedSpot?.id === spot.id
+                    className={`w-full border-2 cursor-pointer ${isSelected(spot)
                       ? "border-[#17A9A6] shadow-lg shadow-[#17A9A6]/10"
                       : "border-[#95DBD5]/30 hover:border-[#17A9A6]/20"
                       }`}
                   >
                     <CardContent className="p-4 flex items-center gap-4">
                       <div
-                        className={`w-12 h-12 rounded-2xl flex items-center justify-center ${selectedSpot?.id === spot.id
+                        className={`w-12 h-12 rounded-2xl flex items-center justify-center ${isSelected(spot)
                           ? "bg-[#17A9A6] text-white"
                           : "bg-[#95DBD5]/20 text-[#17A9A6]"
                           }`}
@@ -187,7 +240,7 @@ export default function MovoApp() {
           size="xl"
           onClick={handleParkNow}
           disabled={!selectedSpot}
-          className="min-w-[200px] bg-[#17A9A6] hover:bg-[#17A9A6]/90 text-white"
+          className="h-12 min-w-[240px] rounded-full px-8 text-base bg-[#17A9A6] hover:bg-[#17A9A6]/90 text-white shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 active:scale-[0.98]"
         >
           {selectedSpot ? (
             <>
