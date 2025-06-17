@@ -26,15 +26,13 @@ interface SpotMenuProps {
 function SpotCard({ spot, onSelect, isSelected }: SpotCardProps) {
   return (
     <div
-      className={`p-4 rounded-2xl border-2 transition-all ${
-        isSelected ? "border-primary bg-secondary shadow-lg" : "border-border hover:border-primary/20 hover:shadow-sm"
-      }`}
+      className={`p-4 rounded-2xl border-2 transition-all ${isSelected ? "border-primary bg-secondary shadow-lg" : "border-border hover:border-primary/20 hover:shadow-sm"
+        }`}
     >
       <div className="flex items-start gap-4">
         <div
-          className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 transition-colors ${
-            isSelected ? "bg-primary text-white" : "bg-secondary text-primary"
-          }`}
+          className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 transition-colors ${isSelected ? "bg-primary text-white" : "bg-secondary text-primary"
+            }`}
         >
           <Car className="w-6 h-6" />
         </div>
@@ -54,15 +52,14 @@ function SpotCard({ spot, onSelect, isSelected }: SpotCardProps) {
             </div>
             <Badge
               variant="secondary"
-              className={`shrink-0 ${
-                spot.type === "Pago"
-                  ? "bg-parkat-primary/10 text-parkat-primary hover:bg-parkat-primary/10"
-                  : spot.type === "Exclusivo"
-                    ? "bg-parkat-light/30 text-parkat-dark hover:bg-parkat-light/30"
-                    : spot.type === "Gratuito"
-                      ? "bg-parkat-gray text-parkat-dark hover:bg-parkat-gray"
-                      : "bg-secondary text-secondary-foreground"
-              }`}
+              className={`shrink-0 ${spot.type === "Pago"
+                ? "bg-parkat-primary/10 text-parkat-primary hover:bg-parkat-primary/10"
+                : spot.type === "Exclusivo"
+                  ? "bg-parkat-light/30 text-parkat-dark hover:bg-parkat-light/30"
+                  : spot.type === "Gratuito"
+                    ? "bg-parkat-gray text-parkat-dark hover:bg-parkat-gray"
+                    : "bg-secondary text-secondary-foreground"
+                }`}
             >
               {spot.type}
             </Badge>
@@ -91,25 +88,24 @@ export function SpotsMenu({ spots, selectedSpot, onSpotSelect }: SpotMenuProps) 
       <SheetTrigger asChild>
         <Button
           variant="outline"
-          className="relative pl-4 pr-10 h-11 border-2 hover:border-primary/30 hover:bg-secondary"
+          className="relative pl-4 pr-10 h-11 border-2 hover:border-primary/30 hover:bg-secondary bg-secondary/50 backdrop-blur-sm"
           onClick={() => {
             console.log("Spots button clicked")
             setIsOpen(true)
           }}
         >
           <span className="font-semibold text-primary mr-1">{spots.length}</span>
-espacios disponibles
+          espacios disponibles
           <span className="absolute right-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-green-500 shadow-lg shadow-green-500/50" />
         </Button>
       </SheetTrigger>
       <SheetContent side="right" className="w-[90vw] sm:w-[540px] p-6">
-        <SheetHeader className="space-y-1">
-          <SheetTitle>Espacios de Aparcamiento Disponibles</SheetTitle>
-          <p className="text-sm text-muted-foreground">Encuentra y selecciona tu espacio de aparcamiento perfecto</p>
+        <SheetHeader>
+          <SheetTitle>Menu</SheetTitle>
         </SheetHeader>
 
         {/* Search and Filter */}
-        <div className="flex gap-2 my-6">
+        <div className="flex gap-2 my-6 pt-8">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input placeholder="Buscar espacios..." className="pl-10" />

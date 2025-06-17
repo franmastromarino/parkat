@@ -11,13 +11,13 @@ import { Badge } from "@/components/ui/badge"
 const menuItems = [
   {
     icon: User,
-    label: "Configuración del Perfil",
-    description: "Administra la información de tu cuenta",
+    label: "Perfil",
+    description: "Información de tu cuenta",
   },
   {
     icon: CreditCard,
     label: "Suscripción",
-    description: "Ve los detalles de tu suscripción",
+    description: "Detalles de tu suscripción",
   },
   {
     icon: Bell,
@@ -51,7 +51,7 @@ export function UserMenu() {
       </SheetTrigger>
       <SheetContent side="left" className="w-[300px] sm:w-[400px] p-6">
         <SheetHeader>
-          <SheetTitle>Menú</SheetTitle>
+          <SheetTitle>Menu</SheetTitle>
         </SheetHeader>
 
         {/* User Profile Section */}
@@ -79,7 +79,7 @@ export function UserMenu() {
             const Icon = item.icon
             return (
               <Button key={index} variant="ghost" className="w-full justify-start gap-4 h-auto p-4 hover:bg-secondary">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-primary text-white">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-primary text-white flex-shrink-0">
                   <Icon className="h-5 w-5" />
                 </div>
                 <div className="flex flex-col items-start">
