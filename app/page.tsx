@@ -141,7 +141,7 @@ export default function App() {
       </header>
 
       <main className="flex-1 flex flex-col max-w-7xl w-full mx-auto min-h-0">
-        <div className="h-[50vh] relative overflow-hidden shadow-lg">
+        <div className="flex-[2] relative overflow-hidden shadow-lg">
           {!isLoaded ? (
             <div className="w-full h-full bg-gray-100 animate-pulse" />
           ) : (
@@ -288,7 +288,7 @@ export default function App() {
               </div>
             </div>
 
-        <div className="flex-1 min-h-0 overflow-hidden">
+        <div className="flex-[3] min-h-0 overflow-hidden">
           <div className="h-full overflow-y-auto">
 
             <div className="px-6 flex flex-col gap-4 py-4">
