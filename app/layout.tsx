@@ -17,7 +17,7 @@ export default function RootLayout({
     <html lang="es" suppressHydrationWarning>
       <body>
         {children}
-        <Toaster position="top-center" />
+        <Toaster position="top-center" visibleToasts={1} duration={2000} />
       </body>
     </html>
   )
