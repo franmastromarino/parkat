@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import type { ParkingSpot } from "@/types/spots"
+import { PAYMENT_STATE_COLORS } from "@/lib/constants"
 
 interface MapProps {
   spots: ParkingSpot[]
@@ -237,19 +238,10 @@ export default function SimpleMap({ spots, selectedSpot, onSpotSelect }: MapProp
               <div
                 className={`absolute w-8 h-8 rounded-full border-2 border-white shadow-lg cursor-pointer transform -translate-x-1/2 -translate-y-1/2 transition-all duration-200 ${
                   isSelected ? "bg-[#17A9A6] scale-125 z-40" : isHovered ? "scale-110 z-35" : ""
-                } ${
-                  !isSelected && !isHovered
-                    ? spot.type === "Pago"
-                      ? "bg-blue-500 hover:scale-110"
-                      : spot.type === "Exclusivo"
-                        ? "bg-orange-500 hover:scale-110"
-                        : "bg-green-500 hover:scale-110"
-                    : spot.type === "Pago"
-                      ? "bg-blue-500"
-                      : spot.type === "Exclusivo"
-                        ? "bg-orange-500"
-                        : "bg-green-500"
-                }`}
+                } hover:scale-110`}
+                style={{
+                  backgroundColor: PAYMENT_STATE_COLORS[spot.type],
+                }}
                 style={{
                   left: `${x}px`,
                   top: `${y}px`,
@@ -286,13 +278,11 @@ export default function SimpleMap({ spots, selectedSpot, onSpotSelect }: MapProp
                       Zone {spot.zone} - Spot {spot.spot}
                     </p>
                     <span
-                      className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${
-                        spot.type === "Pago"
-                          ? "bg-[#17A9A6]/10 text-[#17A9A6]"
-                          : spot.type === "Exclusivo"
-                            ? "bg-[#95DBD5]/30 text-[#022222]"
-                            : "bg-[#F2F5F4] text-[#022222]"
-                      }`}
+                      className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold"
+                      style={{
+                        backgroundColor: `${PAYMENT_STATE_COLORS[spot.type]}20`,
+                        color: PAYMENT_STATE_COLORS[spot.type]
+                      }}
                     >
                       {spot.type}
                     </span>

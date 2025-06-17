@@ -5,6 +5,7 @@ import maplibregl from "maplibre-gl"
 import "maplibre-gl/dist/maplibre-gl.css"
 import styles from "./map.module.css"
 import type { ParkingSpot } from "@/types/spots"
+import { PAYMENT_STATE_COLORS } from "@/lib/constants"
 
 interface MapProps {
   spots: ParkingSpot[]
@@ -122,15 +123,7 @@ export default function Map({ spots, selectedSpot, onSpotSelect }: MapProps) {
           <div class="p-3">
             <div class="flex items-center gap-2 mb-1">
               <p class="font-semibold text-parkat-dark">Zone ${spot.zone} - Spot ${spot.spot}</p>
-              <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${
-                spot.type === "Pago"
-                  ? "bg-parkat-primary/10 text-parkat-primary border-parkat-primary/20"
-                  : spot.type === "Exclusivo"
-                    ? "bg-parkat-light/30 text-parkat-dark border-parkat-light"
-                    : spot.type === "Gratuito"
-                      ? "bg-parkat-gray text-parkat-dark border-parkat-gray"
-                      : "bg-secondary text-secondary-foreground"
-              }">
+              <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold" style="background-color: ${PAYMENT_STATE_COLORS[spot.type]}20; color: ${PAYMENT_STATE_COLORS[spot.type]}; border-color: ${PAYMENT_STATE_COLORS[spot.type]}40;">
                 ${spot.type}
               </span>
             </div>

@@ -128,3 +128,18 @@ body {
 .maplibregl-ctrl-group button + button {
   border-top: 1px solid #e2e8f0;
 }
+
+@keyframes ping-fast {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+.animate-ping-fast {
+  animation: ping-fast 1.2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}

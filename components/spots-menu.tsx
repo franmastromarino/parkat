@@ -1,13 +1,15 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import { Car, Clock, Filter, Search } from "lucide-react"
+import { Sheet, SheetHeader, SheetTitle, SheetTrigger, SheetPortal, SheetOverlay } from "@/components/ui/sheet"
+import * as SheetPrimitive from "@radix-ui/react-dialog"
+import { Car, Clock, Filter, Search, TrendingUp, X } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import type { ParkingSpot } from "@/types/spots"
+import { PAYMENT_STATE_COLORS } from "@/lib/constants"
 import { useState } from "react"
 
 interface SpotCardProps {
@@ -47,19 +49,19 @@ function SpotCard({ spot, onSelect, isSelected }: SpotCardProps) {
                   <Clock className="w-4 h-4" />
                   <span>{spot.maxTime}</span>
                 </div>
-                <span className="text-sm font-medium text-primary">{spot.price}</span>
+                <div className="flex items-center gap-1.5 text-sm font-medium text-primary">
+                  <TrendingUp className="w-4 h-4" />
+                  <span>{spot.probability}</span>
+                </div>
               </div>
             </div>
             <Badge
               variant="secondary"
-              className={`shrink-0 ${spot.type === "Pago"
-                ? "bg-parkat-primary/10 text-parkat-primary hover:bg-parkat-primary/10"
-                : spot.type === "Exclusivo"
-                  ? "bg-parkat-light/30 text-parkat-dark hover:bg-parkat-light/30"
-                  : spot.type === "Gratuito"
-                    ? "bg-parkat-gray text-parkat-dark hover:bg-parkat-gray"
-                    : "bg-secondary text-secondary-foreground"
-                }`}
+              className="shrink-0"
+              style={{
+                backgroundColor: `${PAYMENT_STATE_COLORS[spot.type]}20`,
+                color: PAYMENT_STATE_COLORS[spot.type]
+              }}
             >
               {spot.type}
             </Badge>
@@ -83,49 +85,57 @@ function SpotCard({ spot, onSelect, isSelected }: SpotCardProps) {
 export function SpotsMenu({ spots, selectedSpot, onSpotSelect }: SpotMenuProps) {
   const [isOpen, setIsOpen] = useState(false)
 
+  const toggleMenu = () => {
+    setIsOpen(!isOpen)
+  }
+
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
         <Button
           variant="outline"
           className="relative pl-4 pr-10 h-11 border-2 hover:border-primary/30 hover:bg-secondary bg-secondary/50 backdrop-blur-sm"
-          onClick={() => {
-            console.log("Spots button clicked")
-            setIsOpen(true)
-          }}
+          onClick={toggleMenu}
         >
           <span className="font-semibold text-primary mr-1">{spots.length}</span>
           espacios disponibles
           <span className="absolute right-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-green-500 shadow-lg shadow-green-500/50" />
         </Button>
       </SheetTrigger>
-      <SheetContent side="right" className="w-[90vw] sm:w-[540px] p-6">
-        <SheetHeader>
-          <SheetTitle>Menu</SheetTitle>
-        </SheetHeader>
+      <SheetPortal>
+        <SheetOverlay className="fixed inset-0 top-[76px] z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
+        <SheetPrimitive.Content className="fixed z-50 gap-4 bg-background p-6 shadow-lg transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-500 inset-y-0 top-[76px] right-0 h-[calc(100vh-76px)] w-[90vw] sm:w-[540px] border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right">
+          <SheetHeader>
 
-        {/* Search and Filter */}
-        <div className="flex gap-2 my-6 pt-8">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Buscar espacios..." className="pl-10" />
-          </div>
-          <Button variant="outline" size="icon" className="shrink-0">
-            <Filter className="h-4 w-4" />
-          </Button>
-        </div>
+            {/* Search and Filter */}
+            <div className="flex gap-2 my-6">
+              <div className="relative flex-1">
+                <SheetTitle style={{ display: 'none' }}>Spots</SheetTitle>
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input placeholder="Buscar espacios..." className="pl-10" />
+              </div>
+              <Button variant="outline" size="icon" className="shrink-0">
+                <Filter className="h-4 w-4" />
+              </Button>
+            </div>
+          </SheetHeader>
 
-        <Separator className="my-4" />
+          <Separator className="my-4" />
 
-        {/* Spots List */}
-        <ScrollArea className="h-[calc(100vh-220px)] pr-4 -mr-4">
-          <div className="space-y-3">
-            {spots.map((spot) => (
-              <SpotCard key={spot.id} spot={spot} onSelect={onSpotSelect} isSelected={selectedSpot?.id === spot.id} />
-            ))}
-          </div>
-        </ScrollArea>
-      </SheetContent>
+          {/* Spots List */}
+          <ScrollArea className="h-[calc(100vh-220px)] pr-4 -mr-4">
+            <div className="space-y-3">
+              {spots.map((spot) => (
+                <SpotCard key={spot.id} spot={spot} onSelect={onSpotSelect} isSelected={selectedSpot?.id === spot.id} />
+              ))}
+            </div>
+          </ScrollArea>
+          {/* <SheetPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
+            <X className="h-4 w-4" />
+            <span className="sr-only">Close</span>
+          </SheetPrimitive.Close> */}
+        </SheetPrimitive.Content>
+      </SheetPortal>
     </Sheet>
   )
 }
