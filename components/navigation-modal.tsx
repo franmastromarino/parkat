@@ -39,15 +39,15 @@ export function NavigationModal({ isOpen, onClose, spot }: NavigationModalProps)
   }, [isOpen])
 
   const handleNavigate = (app: "google" | "waze" | "apple") => {
-    if (!userLocation) return
+    if (!userLocation || !spot.coords) return
 
     const { latitude, longitude } = userLocation.coords
-    const destination = `${spot.lat},${spot.lng}`
+    const destination = `${spot.coords.lat},${spot.coords.lng}`
 
     const urls = {
       google: `https://www.google.com/maps/dir/?api=1&origin=${latitude},${longitude}&destination=${destination}&travelmode=driving`,
-      waze: `https://www.waze.com/ul?ll=${spot.lat},${spot.lng}&navigate=yes`,
-      apple: `maps://maps.apple.com/?saddr=${latitude},${longitude}&daddr=${spot.lat},${spot.lng}&dirflg=d`,
+      waze: `https://www.waze.com/ul?ll=${spot.coords.lat},${spot.coords.lng}&navigate=yes`,
+      apple: `maps://maps.apple.com/?saddr=${latitude},${longitude}&daddr=${spot.coords.lat},${spot.coords.lng}&dirflg=d`,
     }
 
     window.open(urls[app], "_blank")
