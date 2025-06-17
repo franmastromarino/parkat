@@ -134,19 +134,12 @@ body {
     transform: scale(1);
     opacity: 1;
   }
-  75%,
   100% {
-    transform: scale(1.5);
+    transform: scale(2);
     opacity: 0;
   }
 }
 
-.animate-ping-fast::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 9999px;
-  background-color: rgba(37, 99, 235, 0.3);
-  animation: ping-fast 0.6s ease-out;
-  z-index: -1;
+.animate-ping-fast {
+  animation: ping-fast 1.2s cubic-bezier(0, 0, 0.2, 1) infinite;
 }

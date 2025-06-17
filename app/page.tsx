@@ -1,49 +1,46 @@
 "use client"
 
-import { useState, useRef, useCallback } from "react"
-import dynamic from "next/dynamic"
+import { useState, useRef, useCallback, useEffect } from "react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Car, Clock, ChevronLeft, ChevronRight, Plus, Navigation } from "lucide-react"
+import { Car, Clock, ChevronLeft, ChevronRight, Plus, Navigation, TrendingUp } from "lucide-react"
 import { UserMenu } from "@/components/user-menu"
 import { SpotsMenu } from "@/components/spots-menu"
 import { parkingSpots } from "@/data/spots"
 import type { ParkingSpot } from "@/types/spots"
 import { NavigationModal } from "@/components/navigation-modal"
-import { GoogleMap, Marker, useLoadScript } from "@react-google-maps/api"
+import { GoogleMap, useLoadScript, OverlayView, DirectionsRenderer } from "@react-google-maps/api"
+import { PAYMENT_STATE_COLORS } from "@/lib/constants"
 
 const sortSpotsByDistance = (spots: ParkingSpot[]) =>
   [...spots].sort((a, b) => parseInt(a.distance) - parseInt(b.distance))
 
-const containerStyle = {
-  width: "100%",
-  height: "100%",
-}
-
-const defaultCenter = { lat: 41.3851, lng: 2.1734 } // Barcelona
-
+const containerStyle = { width: "100%", height: "100%" }
+const defaultCenter = { lat: 41.3851, lng: 2.1734 }
 const LIBRARIES: ("places")[] = ["places"]
 
 export default function App() {
   const [selectedSpot, setSelectedSpot] = useState<ParkingSpot | null>(null)
   const [isNavigationOpen, setIsNavigationOpen] = useState(false)
   const [currentIndex, setCurrentIndex] = useState(0)
-  const sortedSpots = sortSpotsByDistance(parkingSpots)
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null)
+  const [directions, setDirections] = useState<google.maps.DirectionsResult | null>(null)
+  const [animatedMarkerId, setAnimatedMarkerId] = useState<string | null>(null)
 
+  const sortedSpots = sortSpotsByDistance(parkingSpots)
   const itemRefs = useRef<(HTMLDivElement | null)[]>([])
   const mapRef = useRef<google.maps.Map | null>(null)
 
   const scrollToIndex = (index: number) => {
     const el = itemRefs.current[index]
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" })
-    }
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" })
   }
 
   const handleSpotSelect = (spot: ParkingSpot, index: number) => {
     setSelectedSpot(spot)
     setCurrentIndex(index)
+    setAnimatedMarkerId(spot.id) // trigger animation
     scrollToIndex(index)
     toast.success(`Seleccionado Zona ${spot.zone} - Espacio ${spot.spot}`)
     if (spot.coords?.lat && spot.coords?.lng) {
@@ -82,15 +79,58 @@ export default function App() {
     mapRef.current = map
   }, [])
 
+  const calculateRoute = useCallback(() => {
+    if (!userLocation || !selectedSpot?.coords) return
+
+    const directionsService = new google.maps.DirectionsService()
+    directionsService.route(
+      {
+        origin: userLocation,
+        destination: selectedSpot.coords,
+        travelMode: google.maps.TravelMode.DRIVING,
+      },
+      (result, status) => {
+        if (status === "OK" && result) {
+          setDirections(result)
+        } else {
+          toast.error("No se pudo calcular la ruta")
+        }
+      }
+    )
+  }, [userLocation, selectedSpot])
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const coords = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          }
+          setUserLocation(coords)
+          mapRef.current?.panTo(coords)
+        },
+        () => toast.error("No se pudo obtener tu ubicación actual"),
+        { enableHighAccuracy: true }
+      )
+    }
+  }, [])
+
+  useEffect(() => {
+    if (userLocation && selectedSpot) {
+      calculateRoute()
+    }
+  }, [userLocation, selectedSpot, calculateRoute])
+
   const isSelected = (spot: ParkingSpot) => selectedSpot?.id === spot.id
 
   return (
     <div className="h-screen flex flex-col bg-[#F2F5F4]">
-      <header className="flex-shrink-0 z-[1000] bg-[#e0f5f2] backdrop-blur-xl">
+      <header className="flex-shrink-0 z-40 bg-[#e0f5f2] backdrop-blur-xl">
         <div className="max-w-7xl mx-auto p-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <UserMenu />
-            <img src="/logo.png" alt="Logo" className="h-8 object-contain" />
+            <img src="/logo.png" alt="Parkat" className="h-8 object-contain" />
           </div>
           <SpotsMenu
             spots={sortedSpots}
@@ -110,34 +150,104 @@ export default function App() {
               center={selectedSpot?.coords || defaultCenter}
               zoom={15}
               onLoad={onLoad}
+              options={{
+                disableDefaultUI: true,
+                zoomControl: true,
+                gestureHandling: "greedy",
+                styles: [
+                  {
+                    featureType: "poi", // "point of interest"
+                    elementType: "labels",
+                    stylers: [{ visibility: "off" }],
+                  },
+                  {
+                    featureType: "poi.business",
+                    stylers: [{ visibility: "off" }],
+                  },
+                  {
+                    featureType: "poi.attraction",
+                    stylers: [{ visibility: "off" }],
+                  },
+                  {
+                    featureType: "poi.place_of_worship",
+                    stylers: [{ visibility: "off" }],
+                  },
+                  {
+                    featureType: "poi.school",
+                    stylers: [{ visibility: "off" }],
+                  },
+                  {
+                    featureType: "poi.medical",
+                    stylers: [{ visibility: "off" }],
+                  },
+                ],
+              }}
             >
               {sortedSpots.map((spot) => (
-                <Marker
+                <OverlayView
                   key={spot.id}
                   position={spot.coords}
-                  icon={{
-                    path: google.maps.SymbolPath.CIRCLE,
-                    scale: 10,
-                    fillColor:
-                      spot.type === "Pago"
-                        ? "#F97316"
-                        : spot.type === "Gratuito"
-                          ? "#10B981"
-                          : "#3B82F6",
-                    fillOpacity: 1,
-                    strokeWeight: isSelected(spot) ? 2 : 0,
-                    strokeColor: "white",
-                  }}
-                  label={{
-                    text: "P",
-                    color: "white",
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                  }}
-                  onClick={() => handleSpotSelect(spot, sortedSpots.findIndex((s) => s.id === spot.id))}
-                />
+                  mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+                >
+                  <div
+                    onClick={() => handleSpotSelect(spot, sortedSpots.findIndex((s) => s.id === spot.id))}
+                    className="cursor-pointer relative w-8 h-8 flex items-center justify-center"
+                  >
+                    {isSelected(spot) && (
+                      <div
+                        className="absolute animate-ping-fast w-full h-full rounded-full opacity-75"
+                        style={{
+                          backgroundColor:
+                            spot.type === "Pago"
+                              ? "#F97316"
+                              : spot.type === "Gratuito"
+                                ? "#10B981"
+                                : "#3B82F6",
+                        }}
+                      />
+                    )}
+                    <div
+                      className="w-6 h-6 rounded-full z-10 flex items-center justify-center border-2 border-white"
+                      style={{
+                        backgroundColor: PAYMENT_STATE_COLORS[spot.type],
+                      }}
+                    >
+                      <Car className="w-3 h-3 text-white" />
+                    </div>
+                  </div>
+                </OverlayView>
               ))}
+
+              {userLocation && (
+                <OverlayView position={userLocation} mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}>
+                  <div
+                    onClick={() => {
+                      toast.success("Ubicación actual seleccionada como punto de partida")
+                      if (selectedSpot) calculateRoute()
+                    }}
+                    className="cursor-pointer relative w-6 h-6 flex items-center justify-center"
+                  >
+                    <div className="absolute animate-ping-fast w-full h-full bg-blue-400 rounded-full opacity-75" />
+                    <div className="w-3 h-3 bg-blue-600 rounded-full z-10" />
+                  </div>
+                </OverlayView>
+              )}
+
+              {directions && (
+                <DirectionsRenderer
+                  directions={directions}
+                  options={{
+                    suppressMarkers: true,
+                    polylineOptions: {
+                      strokeColor: "#17A9A6",
+                      strokeOpacity: 0.9,
+                      strokeWeight: 5,
+                    },
+                  }}
+                />
+              )}
             </GoogleMap>
+
           )}
           <div className="absolute bottom-4 left-4 z-10 bg-white/90 backdrop-blur-sm rounded-xl px-4 py-2 shadow-md text-sm flex gap-4 items-center">
             <div className="flex items-center gap-1">
@@ -206,12 +316,11 @@ export default function App() {
                             Zona {spot.zone} - Espacio {spot.spot}
                           </p>
                           <span
-                            className={`text-xs font-semibold px-2 py-0.5 rounded-full ${spot.type === "Pago"
-                              ? "bg-[#17A9A6]/10 text-[#17A9A6]"
-                              : spot.type === "Exclusivo"
-                                ? "bg-[#95DBD5]/30 text-[#022222]"
-                                : "bg-[#F2F5F4] text-[#022222]"
-                              }`}
+                            className="text-xs font-semibold px-2 py-0.5 rounded-full"
+                            style={{
+                              backgroundColor: `${PAYMENT_STATE_COLORS[spot.type]}20`,
+                              color: PAYMENT_STATE_COLORS[spot.type]
+                            }}
                           >
                             {spot.type}
                           </span>
@@ -221,7 +330,10 @@ export default function App() {
                             <Clock className="w-4 h-4" />
                             <span>{spot.maxTime}</span>
                           </div>
-                          <span className="font-medium text-[#17A9A6]">{spot.price}</span>
+                          <div className="flex items-center gap-1.5 text-sm font-medium text-primary">
+                            <TrendingUp className="w-4 h-4" />
+                            <span>{spot.probability}</span>
+                          </div>
                           <span className="ml-auto">{spot.distance}</span>
                         </div>
                       </div>

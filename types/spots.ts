@@ -4,7 +4,7 @@ export interface ParkingSpot {
   spot: string
   maxTime: string
   type: "Exclusivo" | "Gratuito" | "Pago"
-  price: string
+  probability: "low" | "medium" | "high"
   distance: string
   coords?: {
     lat: number
