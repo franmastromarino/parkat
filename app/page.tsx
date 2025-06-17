@@ -125,7 +125,7 @@ export default function App() {
   const isSelected = (spot: ParkingSpot) => selectedSpot?.id === spot.id
 
   return (
-    <div className="h-screen flex flex-col bg-[#F2F5F4]">
+    <div className="h-dvh flex flex-col bg-[#F2F5F4] overflow-hidden">
       <header className="flex-shrink-0 z-40 bg-[#e0f5f2] backdrop-blur-xl">
         <div className="max-w-7xl mx-auto p-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -140,7 +140,7 @@ export default function App() {
         </div>
       </header>
 
-      <main className="flex-1 flex flex-col max-w-7xl w-full mx-auto" style={{ height: "calc(100vh - 76px)" }}>
+      <main className="flex-1 flex flex-col max-w-7xl w-full mx-auto min-h-0">
         <div className="h-[50vh] relative overflow-hidden shadow-lg">
           {!isLoaded ? (
             <div className="w-full h-full bg-gray-100 animate-pulse" />
@@ -264,10 +264,7 @@ export default function App() {
             </div>
           </div>
         </div>
-
-        <div className="flex-1 min-h-0 overflow-hidden">
-          <div className="h-full overflow-y-auto">
-            <div className="px-6 sticky top-0 z-30 pt-2 pb-4 flex items-center justify-between before:content-[''] before:absolute before:inset-x-0 before:top-0 before:h-16 before:bg-gradient-to-b before:from-[#F2F5F4]/100 before:to-transparent before:pointer-events-none before:-z-10">
+            <div className="px-6 py-4 flex items-center justify-between relative before:content-[''] before:absolute before:inset-x-0 before:-bottom-5 before:h-5 before:bg-gradient-to-b before:from-[#F2F5F4]/100 before:to-transparent before:pointer-events-none before:z-10">
               <h2 className="text-lg font-semibold text-[#022222]">Espacios Disponibles</h2>
               <div className="flex items-center gap-2">
                 <Button
@@ -291,7 +288,10 @@ export default function App() {
               </div>
             </div>
 
-            <div className="px-6 flex flex-col gap-4" style={{ paddingBottom: "96px" }}>
+        <div className="flex-1 min-h-0 overflow-hidden">
+          <div className="h-full overflow-y-auto">
+
+            <div className="px-6 flex flex-col gap-4 py-4">
               {sortedSpots.map((spot, index) => (
                 <div key={spot.id} ref={(el) => (itemRefs.current[index] = el)}>
                   <Card
@@ -342,29 +342,29 @@ export default function App() {
                 </div>
               ))}
             </div>
+
+            <div className="flex-shrink-0 sticky bottom-0 p-6 pt-12 flex justify-center z-50 bg-gradient-to-t from-[#F2F5F4] to-transparent">
+              <Button
+                variant="default"
+                size="xl"
+                onClick={handleParkNow}
+                disabled={!selectedSpot}
+                className="h-12 min-w-[240px] rounded-full px-8 text-base bg-[#17A9A6] hover:bg-[#17A9A6]/90 text-white shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 active:scale-[0.98]"
+              >
+                {selectedSpot ? (
+                  <>
+                    <Navigation className="w-5 h-5 mr-2" /> Navegar Ahora
+                  </>
+                ) : (
+                  <>
+                    <Plus className="w-5 h-5 mr-2" /> Seleccionar Espacio
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
         </div>
       </main>
-
-      <div className="fixed bottom-0 p-6 left-0 right-0 flex justify-center z-50 before:content-[''] before:absolute before:inset-x-0 before:bottom-0 before:h-24 before:bg-gradient-to-t before:from-[#F2F5F4]/100 before:to-transparent before:pointer-events-none before:-z-10">
-        <Button
-          variant="default"
-          size="xl"
-          onClick={handleParkNow}
-          disabled={!selectedSpot}
-          className="h-12 min-w-[240px] rounded-full px-8 text-base bg-[#17A9A6] hover:bg-[#17A9A6]/90 text-white shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 active:scale-[0.98]"
-        >
-          {selectedSpot ? (
-            <>
-              <Navigation className="w-5 h-5 mr-2" /> Navegar Ahora
-            </>
-          ) : (
-            <>
-              <Plus className="w-5 h-5 mr-2" /> Seleccionar Espacio
-            </>
-          )}
-        </Button>
-      </div>
 
       {selectedSpot && (
         <NavigationModal
